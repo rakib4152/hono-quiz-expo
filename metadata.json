@@ -1,0 +1,6 @@
+{
+  "name": "QuizPulse - Expo & Hono Full-Stack Mobile Quiz",
+  "description": "Production-ready Expo React Native & Hono RPC Quiz application featuring dynamic categories, timed challenges, instant state feedback, and score analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

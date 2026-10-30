@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* NativeWind v4 Global Configuration */
+:root {
+  --color-primary: #10b981;
+  --color-error: #f43f5e;
+}
