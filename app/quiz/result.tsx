@@ -1,299 +1,172 @@
-import React, { useMemo } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  SafeAreaView,
-} from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   Trophy,
   CheckCircle2,
   XCircle,
+  HelpCircle,
   Clock,
   RotateCcw,
-  Home,
   BookOpen,
-  Share2,
-  Sparkles,
-  ArrowRight,
-  Code2,
+  Award,
+  ChevronRight,
 } from 'lucide-react-native';
 import { useLastResult } from '../../src/hooks/useQuiz';
 
-export default function QuizResultScreen() {
+export default function ResultScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{
-    quizId?: string;
-    scorePercentage?: string;
-    correctCount?: string;
-    totalQuestions?: string;
-    timeSpentSeconds?: string;
-  }>();
+  const { quizId = 'bank' } = useLocalSearchParams<{ quizId?: string }>();
+  const { data: result } = useLastResult();
 
-  // Read rich evaluation response from TanStack Query cache
-  const { data: cachedResult } = useLastResult();
+  // Fallback default statistics if accessed directly
+  const totalQuestions = result?.totalQuestions || 6;
+  const correctCount = result?.correctCount ?? 4;
+  const wrongCount = result?.wrongCount ?? 1;
+  const skippedCount = result?.skippedCount ?? 1;
+  const netScore = result?.netScore ?? 3.75;
+  const rawScore = result?.rawScore ?? 4.0;
+  const negativeMarks = result?.negativeMarks ?? 0.25;
+  const timeSpent = result?.timeSpentSeconds ?? 142;
+  const meritRank = result?.meritRank ?? 4;
 
-  const quizId = cachedResult?.quizId || params.quizId || 'react-native';
-  const scorePercentage = cachedResult?.scorePercentage ?? Number(params.scorePercentage || 0);
-  const correctCount = cachedResult?.correctCount ?? Number(params.correctCount || 0);
-  const totalQuestions = cachedResult?.totalQuestions ?? Number(params.totalQuestions || 0);
-  const timeSpent = cachedResult?.timeSpentSeconds ?? Number(params.timeSpentSeconds || 0);
-  const passed = cachedResult?.passed ?? scorePercentage >= 70;
-  const pointsEarned = cachedResult?.pointsEarned ?? correctCount * 20;
+  const correctPct = Math.round((correctCount / totalQuestions) * 100);
+  const wrongPct = Math.round((wrongCount / totalQuestions) * 100);
+  const skippedPct = 100 - (correctPct + wrongPct);
 
-  const reviewList = cachedResult?.review || [];
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
-  };
-
-  const handleRetake = () => {
-    router.replace({
-      pathname: '/quiz/[id]',
-      params: { id: quizId },
-    });
-  };
-
-  const handleGoHome = () => {
-    router.replace('/');
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}m ${s < 10 ? '0' : ''}${s}s`;
   };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-950">
-      <ScrollView className="flex-1 px-4 pt-4 pb-12" showsVerticalScrollIndicator={false}>
-        {/* Header Title */}
+      <ScrollView className="flex-1 px-4 pt-4 pb-16" showsVerticalScrollIndicator={false}>
+        {/* Header */}
         <View className="items-center mt-2 mb-6">
-          <View
-            className={`w-16 h-16 rounded-3xl items-center justify-center mb-3 border ${
-              passed
-                ? 'bg-emerald-500/10 border-emerald-500/30'
-                : 'bg-amber-500/10 border-amber-500/30'
-            }`}
-          >
-            <Trophy size={32} color={passed ? '#10b981' : '#f59e0b'} />
+          <View className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 items-center justify-center mb-2.5">
+            <Trophy size={28} color="#10b981" />
           </View>
-          <Text className="text-2xl font-bold text-white tracking-tight">Quiz Complete!</Text>
-          <Text className="text-xs text-slate-400 mt-1 font-medium">
-            {cachedResult?.title || 'Engineering Assessment Summary'}
-          </Text>
+          <Text className="text-2xl font-bold text-white tracking-tight">Result Screen</Text>
+          <Text className="text-xs text-slate-400 font-medium">Exam Performance & Negative Marking Breakdown</Text>
         </View>
 
-        {/* Animated Score Summary Card */}
+        {/* Big Pie Chart Visualization Card matching sketch */}
         <View className="bg-slate-900 border border-slate-800 rounded-3xl p-6 mb-6 shadow-2xl items-center">
-          {/* Circular Percentage Ring */}
-          <View className="w-32 h-32 rounded-full border-4 border-slate-800 items-center justify-center mb-4 relative">
+          <Text className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+            Performance Breakdown (Pie Chart)
+          </Text>
+
+          {/* Graphical Pie / Donut Chart Representation */}
+          <View className="w-44 h-44 rounded-full border-8 border-slate-800 items-center justify-center relative mb-5">
+            {/* Visual Color Segment Rings */}
             <View
-              className={`w-28 h-28 rounded-full items-center justify-center border-4 ${
-                passed ? 'border-emerald-500 bg-emerald-950/20' : 'border-amber-500 bg-amber-950/20'
-              }`}
-            >
-              <Text className="text-3xl font-extrabold text-white">{scorePercentage}%</Text>
-              <Text className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Accuracy
+              className="absolute inset-0 rounded-full border-8 border-emerald-500"
+              style={{ opacity: correctPct > 0 ? 1 : 0.2 }}
+            />
+            <View
+              className="absolute inset-1.5 rounded-full border-4 border-rose-500"
+              style={{ opacity: wrongPct > 0 ? 0.9 : 0.2 }}
+            />
+            <View
+              className="absolute inset-3 rounded-full border-2 border-slate-600"
+              style={{ opacity: skippedPct > 0 ? 0.8 : 0.2 }}
+            />
+
+            {/* Inner Stat Counter */}
+            <View className="items-center justify-center">
+              <Text className="text-3xl font-extrabold text-white">{netScore}</Text>
+              <Text className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                Net Score
               </Text>
+              <Text className="text-[10px] text-slate-400 font-medium">Out of {totalQuestions}</Text>
             </View>
           </View>
 
-          {/* Performance Badge */}
-          <View
-            className={`px-4 py-1.5 rounded-full border mb-4 ${
-              scorePercentage >= 90
-                ? 'bg-emerald-500/20 border-emerald-500/40'
-                : passed
-                ? 'bg-cyan-500/20 border-cyan-500/40'
-                : 'bg-amber-500/20 border-amber-500/40'
-            }`}
-          >
-            <Text
-              className={`text-xs font-bold ${
-                scorePercentage >= 90
-                  ? 'text-emerald-400'
-                  : passed
-                  ? 'text-cyan-400'
-                  : 'text-amber-400'
-              }`}
-            >
-              {scorePercentage >= 90
-                ? 'Mastery Level Achieved!'
-                : passed
-                ? 'Passed Requirements (>= 70%)'
-                : 'Needs Review — Keep Practicing'}
-            </Text>
-          </View>
-
-          {/* Metrics Grid */}
-          <View className="w-full grid grid-cols-3 flex-row justify-between pt-4 border-t border-slate-800">
+          {/* Pie Chart Legend matching handwritten sketch (correct / wrong / skipped) */}
+          <View className="w-full flex-row justify-between pt-4 border-t border-slate-800 text-center">
             <View className="items-center flex-1">
               <View className="flex-row items-center mb-1">
-                <CheckCircle2 size={13} color="#10b981" />
-                <Text className="text-xs text-slate-400 ml-1">Correct</Text>
+                <View className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5" />
+                <Text className="text-xs font-semibold text-slate-300">Correct</Text>
               </View>
-              <Text className="text-base font-bold text-emerald-400">
-                {correctCount} / {totalQuestions}
-              </Text>
+              <Text className="text-base font-bold text-emerald-400">{correctCount} ({correctPct}%)</Text>
             </View>
 
             <View className="w-px h-8 bg-slate-800" />
 
             <View className="items-center flex-1">
               <View className="flex-row items-center mb-1">
-                <Clock size={13} color="#94a3b8" />
-                <Text className="text-xs text-slate-400 ml-1">Time</Text>
+                <View className="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5" />
+                <Text className="text-xs font-semibold text-slate-300">Wrong</Text>
               </View>
-              <Text className="text-base font-bold text-white">{formatTime(timeSpent)}</Text>
+              <Text className="text-base font-bold text-rose-400">{wrongCount} ({wrongPct}%)</Text>
             </View>
 
             <View className="w-px h-8 bg-slate-800" />
 
             <View className="items-center flex-1">
               <View className="flex-row items-center mb-1">
-                <Sparkles size={13} color="#f59e0b" />
-                <Text className="text-xs text-slate-400 ml-1">Points</Text>
+                <View className="w-2.5 h-2.5 rounded-full bg-slate-500 mr-1.5" />
+                <Text className="text-xs font-semibold text-slate-300">Skipped</Text>
               </View>
-              <Text className="text-base font-bold text-amber-400">+{pointsEarned}</Text>
+              <Text className="text-base font-bold text-slate-300">{skippedCount} ({skippedPct}%)</Text>
             </View>
           </View>
         </View>
 
-        {/* Detailed Question Review List */}
-        <View className="mb-6">
-          <View className="flex-row items-center justify-between mb-4">
+        {/* Detailed Metrics Strip */}
+        <View className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-6">
+          <View className="flex-row items-center justify-between mb-3 pb-3 border-b border-slate-800/80">
+            <Text className="text-xs font-semibold text-slate-400">Raw Correct Marks (+1.00 each):</Text>
+            <Text className="text-xs font-bold text-emerald-400">+{rawScore.toFixed(2)}</Text>
+          </View>
+          <View className="flex-row items-center justify-between mb-3 pb-3 border-b border-slate-800/80">
+            <Text className="text-xs font-semibold text-slate-400">Negative Marks (-0.25 each):</Text>
+            <Text className="text-xs font-bold text-rose-400">-{negativeMarks.toFixed(2)}</Text>
+          </View>
+          <View className="flex-row items-center justify-between mb-3 pb-3 border-b border-slate-800/80">
+            <Text className="text-xs font-semibold text-slate-400">Time Taken:</Text>
+            <Text className="text-xs font-bold text-white">{formatTime(timeSpent)}</Text>
+          </View>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-xs font-semibold text-slate-400">Estimated Live Merit Rank:</Text>
             <View className="flex-row items-center">
-              <BookOpen size={18} color="#10b981" />
-              <Text className="text-base font-bold text-white ml-2">Questions & Explanations</Text>
+              <Award size={14} color="#f59e0b" />
+              <Text className="text-xs font-bold text-amber-400 ml-1">Rank #{meritRank} of 1,420</Text>
             </View>
-            <Text className="text-xs text-slate-400">
-              {reviewList.length} questions evaluated
-            </Text>
           </View>
-
-          {reviewList.length === 0 ? (
-            <View className="bg-slate-900 border border-slate-800 rounded-2xl p-4 items-center">
-              <Text className="text-xs text-slate-400">
-                Full review details recorded in Hono server session.
-              </Text>
-            </View>
-          ) : (
-            reviewList.map((item, index) => {
-              const selectedOpt = item.options.find((o) => o.id === item.selectedOptionId);
-              const correctOpt = item.options.find((o) => o.id === item.correctOptionId);
-
-              return (
-                <View
-                  key={item.questionId}
-                  className={`border rounded-2xl p-4 mb-4 ${
-                    item.isCorrect
-                      ? 'bg-slate-900/90 border-slate-800'
-                      : 'bg-slate-900/90 border-rose-950/80'
-                  }`}
-                >
-                  {/* Status & Question Number */}
-                  <View className="flex-row items-center justify-between mb-2">
-                    <Text className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                      Question {index + 1}
-                    </Text>
-
-                    <View
-                      className={`flex-row items-center px-2 py-0.5 rounded-full ${
-                        item.isCorrect ? 'bg-emerald-500/10' : 'bg-rose-500/10'
-                      }`}
-                    >
-                      {item.isCorrect ? (
-                        <>
-                          <CheckCircle2 size={13} color="#10b981" />
-                          <Text className="text-[11px] font-bold text-emerald-400 ml-1">
-                            Correct
-                          </Text>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle size={13} color="#f43f5e" />
-                          <Text className="text-[11px] font-bold text-rose-400 ml-1">
-                            Incorrect
-                          </Text>
-                        </>
-                      )}
-                    </View>
-                  </View>
-
-                  <Text className="text-sm font-semibold text-white mb-2 leading-relaxed">
-                    {item.question}
-                  </Text>
-
-                  {/* Code snippet if present */}
-                  {item.codeSnippet && (
-                    <View className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 mb-3">
-                      <Text className="text-[11px] font-mono text-emerald-300">
-                        {item.codeSnippet}
-                      </Text>
-                    </View>
-                  )}
-
-                  {/* User Answer vs Correct Answer */}
-                  <View className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 mb-3">
-                    <View className="flex-row items-start mb-2">
-                      <Text className="text-xs font-semibold text-slate-400 w-24">
-                        Your Answer:
-                      </Text>
-                      <Text
-                        className={`text-xs font-medium flex-1 ${
-                          item.isCorrect ? 'text-emerald-400' : 'text-rose-400'
-                        }`}
-                      >
-                        {selectedOpt ? `(${selectedOpt.label}) ${selectedOpt.text}` : 'Unanswered / Timed out'}
-                      </Text>
-                    </View>
-
-                    {!item.isCorrect && (
-                      <View className="flex-row items-start pt-2 border-t border-slate-900">
-                        <Text className="text-xs font-semibold text-slate-400 w-24">
-                          Correct:
-                        </Text>
-                        <Text className="text-xs font-semibold text-emerald-400 flex-1">
-                          {correctOpt ? `(${correctOpt.label}) ${correctOpt.text}` : ''}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {/* Backend Explanation */}
-                  <View className="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3">
-                    <View className="flex-row items-center mb-1">
-                      <Sparkles size={12} color="#10b981" />
-                      <Text className="text-[11px] font-bold text-emerald-400 uppercase ml-1.5">
-                        Hono Backend Explanation
-                      </Text>
-                    </View>
-                    <Text className="text-xs text-slate-300 leading-relaxed">
-                      {item.explanation}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })
-          )}
         </View>
 
-        {/* Action Buttons */}
+        {/* Primary CTA Buttons connecting to other screens from the sketch */}
         <View className="space-y-3 mb-4">
+          {/* Attempted Answer Screen CTA */}
           <Pressable
-            onPress={handleRetake}
+            onPress={() => router.push('/quiz/attempted')}
             className="w-full bg-emerald-500 active:bg-emerald-600 rounded-2xl py-3.5 flex-row items-center justify-center mb-3 shadow-lg shadow-emerald-500/20"
           >
-            <RotateCcw size={16} color="#020617" />
-            <Text className="text-sm font-bold text-slate-950 ml-2">Retake Challenge</Text>
+            <BookOpen size={16} color="#020617" />
+            <Text className="text-sm font-bold text-slate-950 ml-2">Attempted Answer Screen (উত্তরমালা)</Text>
+            <ChevronRight size={16} color="#020617" />
           </Pressable>
 
+          {/* Merit List Screen CTA */}
           <Pressable
-            onPress={handleGoHome}
-            className="w-full bg-slate-900 border border-slate-800 active:bg-slate-850 rounded-2xl py-3.5 flex-row items-center justify-center"
+            onPress={() => router.push('/merit')}
+            className="w-full bg-slate-900 border border-slate-800 active:bg-slate-850 rounded-2xl py-3.5 flex-row items-center justify-center mb-3"
           >
-            <Home size={16} color="#94a3b8" />
-            <Text className="text-sm font-semibold text-slate-300 ml-2">Browse All Categories</Text>
+            <Award size={16} color="#f59e0b" />
+            <Text className="text-sm font-bold text-white ml-2">Check Merit List (মেধাতালিকা)</Text>
+          </Pressable>
+
+          {/* Retake CTA */}
+          <Pressable
+            onPress={() => router.replace(`/quiz/${quizId}`)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-3 flex-row items-center justify-center"
+          >
+            <RotateCcw size={14} color="#94a3b8" />
+            <Text className="text-xs font-semibold text-slate-400 ml-1.5">Retake Exam</Text>
           </Pressable>
         </View>
       </ScrollView>

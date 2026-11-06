@@ -1,57 +1,62 @@
-export type Difficulty = 'easy' | 'medium' | 'hard';
+export type JobType = 'bcs' | 'bank' | 'govt' | 'private';
 
 export interface QuizCategory {
   id: string;
   title: string;
+  titleBn: string;
   description: string;
   iconName: string;
   colorAccent: string;
   totalQuestions: number;
-  difficulties: Difficulty[];
-  estimatedMinutes: number;
+  durationMinutes: number;
+  candidateCount: number;
 }
 
 export interface QuizOption {
   id: string;
+  label: 'A' | 'B' | 'C' | 'D';
   text: string;
-  label: string;
 }
 
 export interface QuizQuestion {
   id: string;
-  category: string;
-  difficulty: Difficulty;
+  subject: 'bangla' | 'english' | 'gk' | 'math';
+  subjectNameBn: string;
+  questionNumber: number;
   question: string;
-  codeSnippet?: string;
   options: QuizOption[];
   correctOptionId: string;
   explanation: string;
-  points: number;
+  marks: number;
 }
 
 export interface QuizPayload {
   id: string;
   title: string;
-  category: string;
+  category: JobType;
   description: string;
-  difficulty: Difficulty;
-  timeLimitSeconds: number; // Time limit per question or whole quiz
+  totalMarks: number;
+  negativeMarkPerWrong: number;
+  timeLimitSeconds: number;
   questions: Omit<QuizQuestion, 'correctOptionId' | 'explanation'>[];
 }
 
 export interface SubmitQuizRequest {
   quizId: string;
-  answers: Record<string, string>; // questionId -> selectedOptionId
+  answers: Record<string, string>; // questionId -> optionId
   timeSpentSeconds: number;
 }
 
 export interface QuestionReviewItem {
   questionId: string;
+  questionNumber: number;
+  subject: 'bangla' | 'english' | 'gk' | 'math';
+  subjectNameBn: string;
   question: string;
-  codeSnippet?: string;
   selectedOptionId: string | null;
   correctOptionId: string;
   isCorrect: boolean;
+  isSkipped: boolean;
   explanation: string;
   options: QuizOption[];
 }
@@ -60,14 +65,54 @@ export interface SubmitQuizResponse {
   quizId: string;
   title: string;
   totalQuestions: number;
-  answeredCount: number;
+  attemptedCount: number;
   correctCount: number;
-  incorrectCount: number;
-  scorePercentage: number;
-  pointsEarned: number;
-  totalPossiblePoints: number;
+  wrongCount: number;
+  skippedCount: number;
+  rawScore: number;
+  negativeMarks: number;
+  netScore: number;
+  accuracyPercentage: number;
   timeSpentSeconds: number;
-  passed: boolean; // >= 70%
+  meritRank: number;
   completedAt: string;
+  pieChart: {
+    correctPercentage: number;
+    wrongPercentage: number;
+    skippedPercentage: number;
+  };
   review: QuestionReviewItem[];
+}
+
+export interface MeritStudent {
+  rank: number;
+  name: string;
+  avatar: string;
+  institution: string;
+  score: number;
+  totalMarks: number;
+  timeTaken: string;
+  accuracy: number;
+  jobTarget: string;
+}
+
+export interface FacebookFriend {
+  id: string;
+  name: string;
+  avatar: string;
+  mutualFriends: number;
+  status: 'invited' | 'joined' | 'pending';
+  rewardEarnedTk: number;
+}
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  institution: string;
+  jobType: JobType;
+  attemptedQuizCount: number;
+  totalMarksScored: number;
+  averageAccuracy: number;
+  affiliateEarningsTk: number;
+  referralCode: string;
 }

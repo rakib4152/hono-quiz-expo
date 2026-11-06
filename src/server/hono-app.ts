@@ -8,314 +8,386 @@ import type {
   SubmitQuizRequest,
   SubmitQuizResponse,
   QuestionReviewItem,
+  MeritStudent,
+  FacebookFriend,
+  UserProfile,
 } from '../types/quiz';
 
-// Question Bank
+const CATEGORIES: QuizCategory[] = [
+  {
+    id: 'bcs',
+    title: 'BCS Preliminary',
+    titleBn: 'বিসিএস প্রিলিমিনারি',
+    description: '47th BCS special model test with negative marking.',
+    iconName: 'GraduationCap',
+    colorAccent: 'emerald',
+    totalQuestions: 6,
+    durationMinutes: 10,
+    candidateCount: 14250,
+  },
+  {
+    id: 'bank',
+    title: 'Bank Recruitment',
+    titleBn: 'ব্যাংক জব প্রস্তুতি',
+    description: 'Combined 8 Banks & Bangladesh Bank Officer test.',
+    iconName: 'Landmark',
+    colorAccent: 'blue',
+    totalQuestions: 6,
+    durationMinutes: 10,
+    candidateCount: 9800,
+  },
+  {
+    id: 'govt',
+    title: 'Govt. Job',
+    titleBn: 'সরকারি চাকরি',
+    description: 'Primary, Non-cadre & Ministry recruitment test.',
+    iconName: 'Building2',
+    colorAccent: 'amber',
+    totalQuestions: 6,
+    durationMinutes: 8,
+    candidateCount: 18400,
+  },
+  {
+    id: 'private',
+    title: 'Private / Corporate',
+    titleBn: 'প্রাইভেট ও করপোরেট',
+    description: 'MNC, telecom, fintech & corporate aptitude test.',
+    iconName: 'Briefcase',
+    colorAccent: 'violet',
+    totalQuestions: 6,
+    durationMinutes: 8,
+    candidateCount: 6200,
+  },
+];
+
 const QUESTION_BANK: Record<string, QuizQuestion[]> = {
-  'react-native': [
+  bank: [
     {
-      id: 'rn-1',
-      category: 'react-native',
-      difficulty: 'easy',
-      question: 'Which component in React Native is used to provide touch feedback on modern iOS & Android?',
+      id: 'bnk-1',
+      subject: 'bangla',
+      subjectNameBn: 'বাংলা',
+      questionNumber: 1,
+      question: 'কোন বানানটি শুদ্ধ?',
       options: [
-        { id: 'opt-a', label: 'A', text: '<Pressable>' },
-        { id: 'opt-b', label: 'B', text: '<Div>' },
-        { id: 'opt-c', label: 'C', text: '<TouchContainer>' },
-        { id: 'opt-d', label: 'D', text: '<Clickable>' },
+        { id: 'opt-a', label: 'A', text: 'মুহূর্মুহু' },
+        { id: 'opt-b', label: 'B', text: 'মুহূর্ত' },
+        { id: 'opt-c', label: 'C', text: 'মূহুর্ত' },
+        { id: 'opt-d', label: 'D', text: 'মুহূমুহু' },
       ],
-      correctOptionId: 'opt-a',
-      explanation: '<Pressable> is the core component intended for interacting with touches in React Native. It replaces older Touchable components with direct press state hooks.',
-      points: 10,
+      correctOptionId: 'opt-b',
+      explanation: 'শুদ্ধ বানান হলো "মুহূর্ত" (ম-এ হ্রস্ব উ-কার, হ-এ দীর্ঘ ঊ-কার, রেফ ত)।',
+      marks: 1,
     },
     {
-      id: 'rn-2',
-      category: 'react-native',
-      difficulty: 'medium',
-      question: 'In NativeWind v4, what compile-time engine powers the styling directly onto React Native yoga primitives?',
-      codeSnippet: `// tailwind.config.js
-module.exports = {
-  presets: [require("nativewind/preset")],
-};`,
+      id: 'bnk-2',
+      subject: 'bangla',
+      subjectNameBn: 'বাংলা',
+      questionNumber: 2,
+      question: '"কাজী নজরুল ইসলাম" কোন পত্রিকার সম্পাদক ছিলেন?',
       options: [
-        { id: 'opt-a', label: 'A', text: 'Tailwind CSS v4 Oxide compiler via PostCSS & Babel preset' },
-        { id: 'opt-b', label: 'B', text: 'Runtime CSS-in-JS emotion parser' },
-        { id: 'opt-c', label: 'C', text: 'WebKit Layout Engine' },
-        { id: 'opt-d', label: 'D', text: 'Android View XML Generator' },
+        { id: 'opt-a', label: 'A', text: 'ধূমকেতু' },
+        { id: 'opt-b', label: 'B', text: 'সবুজপত্র' },
+        { id: 'opt-c', label: 'C', text: 'লাঙল' },
+        { id: 'opt-d', label: 'D', text: 'কল্লোল' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'NativeWind v4 uses the modern Tailwind v4 compilation pipeline to precompile Tailwind utilities directly into native StyleSheet objects at build time for near-zero runtime overhead.',
-      points: 20,
+      explanation: '১৯২২ সালে প্রকাশিত অর্ধ-সাপ্তাহিক "ধূমকেতু" পত্রিকার সম্পাদক ছিলেন কাজী নজরুল ইসলাম।',
+      marks: 1,
     },
     {
-      id: 'rn-3',
-      category: 'react-native',
-      difficulty: 'hard',
-      question: 'What is the primary benefit of the React Native New Architecture (Fabric + TurboModules) using JSI?',
+      id: 'bnk-3',
+      subject: 'english',
+      subjectNameBn: 'ইংরেজি',
+      questionNumber: 3,
+      question: 'Choose the correct synonym of "Paucity":',
       options: [
-        { id: 'opt-a', label: 'A', text: 'Synchronous C++ JavaScript Interface eliminating async JSON bridge serializations' },
-        { id: 'opt-b', label: 'B', text: 'It converts JavaScript into WebAssembly automatically' },
-        { id: 'opt-c', label: 'C', text: 'It runs Python in the native thread' },
-        { id: 'opt-d', label: 'D', text: 'It forces all state into Redux store' },
+        { id: 'opt-a', label: 'A', text: 'Scarcity' },
+        { id: 'opt-b', label: 'B', text: 'Surplus' },
+        { id: 'opt-c', label: 'C', text: 'Abundance' },
+        { id: 'opt-d', label: 'D', text: 'Affluence' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'The JavaScript Interface (JSI) allows JavaScript to hold direct references to C++ Host Objects, removing the JSON message serialization bottleneck across the asynchronous bridge.',
-      points: 30,
+      explanation: '"Paucity" means the presence of something only in small or insufficient quantities or amounts; Scarcity.',
+      marks: 1,
     },
     {
-      id: 'rn-4',
-      category: 'react-native',
-      difficulty: 'medium',
-      question: 'In Expo Router, how do you retrieve dynamic route parameters such as /quiz/[id]?',
-      codeSnippet: `// app/quiz/[id].tsx
-import { useLocalSearchParams } from 'expo-router';
-
-export default function QuizScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  return <Text>Quiz ID: {id}</Text>;
-}`,
+      id: 'bnk-4',
+      subject: 'english',
+      subjectNameBn: 'ইংরেজি',
+      questionNumber: 4,
+      question: 'The committee has submitted ___ report on time.',
       options: [
-        { id: 'opt-a', label: 'A', text: 'useLocalSearchParams() hook from expo-router' },
-        { id: 'opt-b', label: 'B', text: 'window.location.search' },
-        { id: 'opt-c', label: 'C', text: 'props.navigation.getParam()' },
-        { id: 'opt-d', label: 'D', text: 'useRouterQuery()' },
+        { id: 'opt-a', label: 'A', text: 'its' },
+        { id: 'opt-b', label: 'B', text: 'their' },
+        { id: 'opt-c', label: 'C', text: "it's" },
+        { id: 'opt-d', label: 'D', text: 'there' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'Expo Router provides useLocalSearchParams<T>() to access statically typed route segments matching dynamic filenames like [id].tsx.',
-      points: 20,
-    },
-  ],
-  typescript: [
-    {
-      id: 'ts-1',
-      category: 'typescript',
-      difficulty: 'easy',
-      question: 'Which TypeScript utility type constructs a type with all properties of Type set to optional?',
-      options: [
-        { id: 'opt-a', label: 'A', text: 'Partial<T>' },
-        { id: 'opt-b', label: 'B', text: 'Optional<T>' },
-        { id: 'opt-c', label: 'C', text: 'Nullable<T>' },
-        { id: 'opt-d', label: 'D', text: 'PickOptional<T>' },
-      ],
-      correctOptionId: 'opt-a',
-      explanation: 'Partial<T> marks all properties of type T as optional by applying the ? modifier to each key.',
-      points: 10,
+      explanation: 'When a collective noun acts as a single unified entity, singular neuter pronoun "its" is used.',
+      marks: 1,
     },
     {
-      id: 'ts-2',
-      category: 'typescript',
-      difficulty: 'medium',
-      question: 'What does the `satisfies` operator introduced in TypeScript 4.9 accomplish?',
-      codeSnippet: `const palette = {
-  primary: '#0284c7',
-  secondary: [255, 100, 50],
-} satisfies Record<string, string | number[]>;
-
-// palette.secondary can safely call .slice()!`,
+      id: 'bnk-5',
+      subject: 'gk',
+      subjectNameBn: 'সাধারণ জ্ঞান',
+      questionNumber: 5,
+      question: 'বাংলাদেশ ব্যাংকের বর্তমান গভর্নরের নাম কী?',
       options: [
-        { id: 'opt-a', label: 'A', text: 'Validates type conformity while retaining literal inferred specific types' },
-        { id: 'opt-b', label: 'B', text: 'Casts the variable to any' },
-        { id: 'opt-c', label: 'C', text: 'Forces runtime schema validation like Zod' },
-        { id: 'opt-d', label: 'D', text: 'Converts objects into JSON strings' },
+        { id: 'opt-a', label: 'A', text: 'ড. আহসান এইচ মনসুর' },
+        { id: 'opt-b', label: 'B', text: 'আব্দুর রউফ তালুকদার' },
+        { id: 'opt-c', label: 'C', text: 'ফজলে কবির' },
+        { id: 'opt-d', label: 'D', text: 'ড. আতিউর রহমান' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'The satisfies operator verifies that an expression matches a type, but preserves the most specific type for the expression instead of widening it.',
-      points: 20,
+      explanation: 'বাংলাদেশ ব্যাংকের বর্তমান ১৩তম গভর্নর হলেন অর্থনীতিবিদ ড. আহসান এইচ মনসুর।',
+      marks: 1,
     },
     {
-      id: 'ts-3',
-      category: 'typescript',
-      difficulty: 'hard',
-      question: 'How does Hono achieve end-to-end type safety between backend and frontend without code generation?',
-      codeSnippet: `// Backend
-const app = new Hono().get('/api/users', (c) => c.json({ users: [] }));
-export type AppType = typeof app;
-
-// Frontend
-import { hc } from 'hono/client';
-const client = hc<AppType>('https://api.example.com');`,
+      id: 'bnk-6',
+      subject: 'gk',
+      subjectNameBn: 'সাধারণ জ্ঞান',
+      questionNumber: 6,
+      question: 'Bretton Woods Conference-এর মাধ্যমে কোন দুটি আন্তর্জাতিক সংস্থা গঠিত হয়?',
       options: [
-        { id: 'opt-a', label: 'A', text: 'By exporting TypeScript typeof AppType and chaining RPC type definitions through hc<AppType>' },
-        { id: 'opt-b', label: 'B', text: 'By running an external GraphQL compiler in a cron job' },
-        { id: 'opt-c', label: 'C', text: 'Through protobuf binary contracts generated at runtime' },
-        { id: 'opt-d', label: 'D', text: 'By downloading swagger.json on every mobile app boot' },
+        { id: 'opt-a', label: 'A', text: 'IMF এবং World Bank' },
+        { id: 'opt-b', label: 'B', text: 'WTO এবং ADB' },
+        { id: 'opt-c', label: 'C', text: 'UN এবং UNESCO' },
+        { id: 'opt-d', label: 'D', text: 'OECD এবং OPEC' },
       ],
       correctOptionId: 'opt-a',
-      explanation: "Hono's builder pattern captures route paths, request schemas, and response types in the router instance type. The client `hc<AppType>` maps these into typed method calls with zero build-step code generation.",
-      points: 30,
+      explanation: '১৯৪৪ সালে মার্কিন যুক্তরাষ্ট্রের ব্রেটন উডস সম্মেলনের মাধ্যমে বিশ্বব্যাংক (World Bank) এবং আন্তর্জাতিক মুদ্রা তহবিল (IMF) গঠিত হয়।',
+      marks: 1,
     },
   ],
-  'hono-edge': [
+  bcs: [
     {
-      id: 'hn-1',
-      category: 'hono-edge',
-      difficulty: 'easy',
-      question: 'What runtime environments does Hono natively support with zero changes?',
+      id: 'bcs-1',
+      subject: 'bangla',
+      subjectNameBn: 'বাংলা',
+      questionNumber: 1,
+      question: 'চর্যাপদের আদি কবি কে?',
       options: [
-        { id: 'opt-a', label: 'A', text: 'Cloudflare Workers, Fastly, Deno, Bun, Node.js, and Vercel' },
-        { id: 'opt-b', label: 'B', text: 'Only standard Apache HTTP server' },
-        { id: 'opt-c', label: 'C', text: 'Only Windows Server IIS' },
-        { id: 'opt-d', label: 'D', text: 'Only Python ASGI' },
+        { id: 'opt-a', label: 'A', text: 'লুইপা' },
+        { id: 'opt-b', label: 'B', text: 'কাহ্নপা' },
+        { id: 'opt-c', label: 'C', text: 'শবরপা' },
+        { id: 'opt-d', label: 'D', text: 'ভুসুকুপা' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'Hono is built strictly on standard Web Fetch APIs (Request, Response, URL, Headers), enabling it to run seamlessly on modern Edge runtimes like Cloudflare, Deno, Bun, and Node.js.',
-      points: 10,
+      explanation: 'চর্যাপদের প্রথম পদটি রচনা করেন লুইপা। তাই তাকে চর্যাপদের আদি কবি বলা হয়।',
+      marks: 1,
     },
     {
-      id: 'hn-2',
-      category: 'hono-edge',
-      difficulty: 'medium',
-      question: 'What is the router algorithm used by Hono that delivers ultra-fast route matching?',
+      id: 'bcs-2',
+      subject: 'bangla',
+      subjectNameBn: 'বাংলা',
+      questionNumber: 2,
+      question: '"আমার ভাইয়ের রক্তে রাঙানো একুশে ফেব্রুয়ারি" গানের সুরকার কে?',
       options: [
-        { id: 'opt-a', label: 'A', text: 'RegExpRouter and SmartRouter (combining Trie and compiled RegExp)' },
-        { id: 'opt-b', label: 'B', text: 'Linear array search O(N)' },
-        { id: 'opt-c', label: 'C', text: 'B-Tree disk index' },
-        { id: 'opt-d', label: 'D', text: 'Red-Black tree with async locking' },
+        { id: 'opt-a', label: 'A', text: 'আলতাফ মাহমুদ' },
+        { id: 'opt-b', label: 'B', text: 'আব্দুল গাফফার চৌধুরী' },
+        { id: 'opt-c', label: 'C', text: 'আব্দুল লতিফ' },
+        { id: 'opt-d', label: 'D', text: 'সমর দাস' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'Hono employs RegExpRouter, which compiles multiple route patterns into a single unified regular expression, drastically outperforming traditional router implementations.',
-      points: 20,
-    },
-  ],
-  'tanstack-query': [
-    {
-      id: 'tq-1',
-      category: 'tanstack-query',
-      difficulty: 'easy',
-      question: 'What parameter in TanStack Query controls how long fetched data is considered fresh before refetching in the background?',
-      options: [
-        { id: 'opt-a', label: 'A', text: 'staleTime' },
-        { id: 'opt-b', label: 'B', text: 'gcTime' },
-        { id: 'opt-c', label: 'C', text: 'timeoutMs' },
-        { id: 'opt-d', label: 'D', text: 'cacheExpiration' },
-      ],
-      correctOptionId: 'opt-a',
-      explanation: 'staleTime specifies the duration in milliseconds that fetched data remains fresh. As long as data is fresh, TanStack Query returns it without sending network requests.',
-      points: 10,
+      explanation: 'গানটির রচয়িতা আব্দুল গাফফার চৌধুরী এবং বর্তমান প্রচলিত সুরের সুরকার আলতাফ মাহমুদ (প্রথম সুর করেছিলেন আব্দুল লতিফ)।',
+      marks: 1,
     },
     {
-      id: 'tq-2',
-      category: 'tanstack-query',
-      difficulty: 'medium',
-      question: 'Which method on queryClient is used to trigger background re-fetching after a mutation finishes?',
-      codeSnippet: `const mutation = useMutation({
-  mutationFn: submitQuizAnswers,
-  onSuccess: () => {
-    // Re-fetch quiz history!
-    queryClient.invalidateQueries({ queryKey: ['quiz-history'] });
-  }
-});`,
+      id: 'bcs-3',
+      subject: 'english',
+      subjectNameBn: 'ইংরেজি',
+      questionNumber: 3,
+      question: 'Identify the sentence with correct subject-verb agreement:',
       options: [
-        { id: 'opt-a', label: 'A', text: 'queryClient.invalidateQueries({ queryKey: [...] })' },
-        { id: 'opt-b', label: 'B', text: 'queryClient.deleteCache()' },
-        { id: 'opt-c', label: 'C', text: 'queryClient.reloadWindow()' },
-        { id: 'opt-d', label: 'D', text: 'queryClient.forceFlush()' },
+        { id: 'opt-a', label: 'A', text: 'Neither the teacher nor the students were present.' },
+        { id: 'opt-b', label: 'B', text: 'Neither the teacher nor the students was present.' },
+        { id: 'opt-c', label: 'C', text: 'Neither the teacher nor the students has present.' },
+        { id: 'opt-d', label: 'D', text: 'Neither the teacher or the students are present.' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'invalidateQueries marks matched query caches as stale and actively triggers a background refetch for components currently mounted and observing that key.',
-      points: 20,
+      explanation: 'When compound subjects are connected by "neither...nor", the verb agrees with the subject closest to it ("students" -> "were").',
+      marks: 1,
     },
-  ],
-  'mobile-perf': [
     {
-      id: 'mp-1',
-      category: 'mobile-perf',
-      difficulty: 'medium',
-      question: 'Why should complex animations in React Native run via React Native Reanimated worklets on the UI thread?',
+      id: 'bcs-4',
+      subject: 'english',
+      subjectNameBn: 'ইংরেজি',
+      questionNumber: 4,
+      question: 'What is the noun form of the word "Brief"?',
       options: [
-        { id: 'opt-a', label: 'A', text: 'To maintain 60/120fps even if heavy business logic blocks the JS thread' },
-        { id: 'opt-b', label: 'B', text: 'Because iOS prohibits JavaScript execution entirely' },
-        { id: 'opt-c', label: 'C', text: 'To encrypt animations for app store submission' },
-        { id: 'opt-d', label: 'D', text: 'To reduce battery usage by turning off GPU acceleration' },
+        { id: 'opt-a', label: 'A', text: 'Brevity' },
+        { id: 'opt-b', label: 'B', text: 'Briefness' },
+        { id: 'opt-c', label: 'C', text: 'Briefly' },
+        { id: 'opt-d', label: 'D', text: 'Brevityness' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'Reanimated compiles worklets into native C++ hooks running synchronously on the UI thread, preventing dropped animation frames when the JS thread is busy.',
-      points: 20,
+      explanation: 'The standard abstract noun form of "brief" is "brevity", meaning shortness of duration.',
+      marks: 1,
     },
-  ],
-  'system-design': [
     {
-      id: 'sd-1',
-      category: 'system-design',
-      difficulty: 'hard',
-      question: 'When implementing offline-first quiz submissions in a mobile app, which pattern best guarantees zero lost user answers?',
+      id: 'bcs-5',
+      subject: 'gk',
+      subjectNameBn: 'সাধারণ জ্ঞান',
+      questionNumber: 5,
+      question: 'মুজিবনগর সরকার কবে শপথ গ্রহণ করে?',
       options: [
-        { id: 'opt-a', label: 'A', text: 'Persist attempts to SQLite / MMKV with an idempotent outbox queue and background retry worker' },
-        { id: 'opt-b', label: 'B', text: 'Store answers in volatile React memory state only' },
-        { id: 'opt-c', label: 'C', text: 'Block the screen with an infinite alert until Wi-Fi reconnects' },
-        { id: 'opt-d', label: 'D', text: 'Save answers in temporary URL hash parameters' },
+        { id: 'opt-a', label: 'A', text: '১৭ এপ্রিল ১৯৭১' },
+        { id: 'opt-b', label: 'B', text: '১০ এপ্রিল ১৯৭১' },
+        { id: 'opt-c', label: 'C', text: '২৬ মার্চ ১৯৭১' },
+        { id: 'opt-d', label: 'D', text: '২৫ মার্চ ১৯৭১' },
       ],
       correctOptionId: 'opt-a',
-      explanation: 'An idempotent persistent transactional outbox pattern ensures answers survive app crashes or network loss, syncing safely when connectivity resumes.',
-      points: 30,
+      explanation: '১৯৭১ সালের ১০ এপ্রিল সরকার গঠিত হয় এবং ১৭ এপ্রিল মেহেরপুরের বৈদ্যনাথতলার ভবেরপাড়ায় আনুষ্ঠানিকভাবে শপথ গ্রহণ করে।',
+      marks: 1,
+    },
+    {
+      id: 'bcs-6',
+      subject: 'gk',
+      subjectNameBn: 'সাধারণ জ্ঞান',
+      questionNumber: 6,
+      question: 'ইউরোপের ককপিট (Cockpit of Europe) বলা হয় কোন দেশকে?',
+      options: [
+        { id: 'opt-a', label: 'A', text: 'বেলজিয়াম' },
+        { id: 'opt-b', label: 'B', text: 'সুইজারল্যান্ড' },
+        { id: 'opt-c', label: 'C', text: 'নেদারল্যান্ডস' },
+        { id: 'opt-d', label: 'D', text: 'তুরস্ক' },
+      ],
+      correctOptionId: 'opt-a',
+      explanation: 'বেলজিয়ামকে ইউরোপের ককপিট বা রণক্ষেত্র বলা হয় কারণ ইতিহাসে ইউরোপের বহু যুদ্ধ এখানে সংঘটিত হয়েছে।',
+      marks: 1,
     },
   ],
 };
 
-const CATEGORIES: QuizCategory[] = [
+// Mirror questions for govt and private
+QUESTION_BANK['govt'] = QUESTION_BANK['bcs'];
+QUESTION_BANK['private'] = QUESTION_BANK['bank'];
+
+const MERIT_LIST: MeritStudent[] = [
   {
-    id: 'react-native',
-    title: 'React Native & Expo Ecosystem',
-    description: 'Master Expo SDK 51, NativeWind v4, Fabric architecture, and navigation.',
-    iconName: 'Smartphone',
-    colorAccent: 'emerald',
-    totalQuestions: QUESTION_BANK['react-native'].length,
-    difficulties: ['easy', 'medium', 'hard'],
-    estimatedMinutes: 5,
+    rank: 1,
+    name: 'তানভীর আহমেদ',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80',
+    institution: 'ঢাকা বিশ্ববিদ্যালয়',
+    score: 5.75,
+    totalMarks: 6,
+    timeTaken: '03m 42s',
+    accuracy: 96,
+    jobTarget: 'BCS Admin',
   },
   {
-    id: 'typescript',
-    title: 'TypeScript & Type Gymnastics',
-    description: 'Advanced types, satisfies operator, utility generics, and RPC inference.',
-    iconName: 'Code2',
-    colorAccent: 'blue',
-    totalQuestions: QUESTION_BANK['typescript'].length,
-    difficulties: ['easy', 'medium', 'hard'],
-    estimatedMinutes: 4,
+    rank: 2,
+    name: 'ফারজানা ইয়াসমিন',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80',
+    institution: 'জাহাঙ্গীরনগর বিশ্ববিদ্যালয়',
+    score: 5.5,
+    totalMarks: 6,
+    timeTaken: '04m 10s',
+    accuracy: 92,
+    jobTarget: 'Bangladesh Bank AD',
   },
   {
-    id: 'hono-edge',
-    title: 'Hono & Modern Edge APIs',
-    description: 'RegExpRouter, Web standards, hc RPC clients, and edge middleware.',
-    iconName: 'Flame',
-    colorAccent: 'amber',
-    totalQuestions: QUESTION_BANK['hono-edge'].length,
-    difficulties: ['easy', 'medium'],
-    estimatedMinutes: 3,
+    rank: 3,
+    name: 'রাকিবুল হাসান',
+    avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=120&h=120&q=80',
+    institution: 'বুয়েট (BUET)',
+    score: 5.0,
+    totalMarks: 6,
+    timeTaken: '04m 35s',
+    accuracy: 88,
+    jobTarget: 'BCS Foreign Affairs',
   },
   {
-    id: 'tanstack-query',
-    title: 'TanStack React Query & Caching',
-    description: 'Optimistic updates, cache invalidation, stale-while-revalidate, and mutations.',
-    iconName: 'Zap',
-    colorAccent: 'violet',
-    totalQuestions: QUESTION_BANK['tanstack-query'].length,
-    difficulties: ['easy', 'medium'],
-    estimatedMinutes: 3,
+    rank: 4,
+    name: 'নুসরাত জাহান',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=120&h=120&q=80',
+    institution: 'চট্টগ্রাম বিশ্ববিদ্যালয়',
+    score: 4.75,
+    totalMarks: 6,
+    timeTaken: '05m 12s',
+    accuracy: 83,
+    jobTarget: 'Sonali Bank Senior Officer',
   },
   {
-    id: 'mobile-perf',
-    title: 'Mobile Performance & UI Threads',
-    description: 'Reanimated worklets, memory leaks, FlatList windowing, and frame budgeting.',
-    iconName: 'Gauge',
-    colorAccent: 'rose',
-    totalQuestions: QUESTION_BANK['mobile-perf'].length,
-    difficulties: ['medium'],
-    estimatedMinutes: 3,
+    rank: 5,
+    name: 'মাহমুদুল হক',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80',
+    institution: 'রাজশাহী বিশ্ববিদ্যালয়',
+    score: 4.5,
+    totalMarks: 6,
+    timeTaken: '05m 45s',
+    accuracy: 80,
+    jobTarget: 'Govt. Secondary Teacher',
   },
   {
-    id: 'system-design',
-    title: 'Mobile System Design & Offline Sync',
-    description: 'Outbox queues, idempotency keys, conflict resolution, and battery optimization.',
-    iconName: 'Layers',
-    colorAccent: 'cyan',
-    totalQuestions: QUESTION_BANK['system-design'].length,
-    difficulties: ['hard'],
-    estimatedMinutes: 4,
+    rank: 6,
+    name: 'সাদিয়া আফরিন',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&h=120&q=80',
+    institution: 'জগন্নাথ বিশ্ববিদ্যালয়',
+    score: 4.25,
+    totalMarks: 6,
+    timeTaken: '06m 02s',
+    accuracy: 75,
+    jobTarget: 'Agrani Bank Officer',
   },
 ];
 
-// Initialize and chain Hono router for RPC type inference
+const FB_FRIENDS: FacebookFriend[] = [
+  {
+    id: 'fb-1',
+    name: 'Ashikur Rahman (আশিকুর রহমান)',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=100&q=80',
+    mutualFriends: 42,
+    status: 'joined',
+    rewardEarnedTk: 50,
+  },
+  {
+    id: 'fb-2',
+    name: 'Kazi Shafiul (কাজী শফিউল)',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&h=100&q=80',
+    mutualFriends: 28,
+    status: 'joined',
+    rewardEarnedTk: 50,
+  },
+  {
+    id: 'fb-3',
+    name: 'Mitu Chowdhury (মিতু চৌধুরী)',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80',
+    mutualFriends: 19,
+    status: 'pending',
+    rewardEarnedTk: 0,
+  },
+  {
+    id: 'fb-4',
+    name: 'Imran Nazir (ইমরান নাজির)',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=100&h=100&q=80',
+    mutualFriends: 34,
+    status: 'invited',
+    rewardEarnedTk: 0,
+  },
+  {
+    id: 'fb-5',
+    name: 'Sultana Razia (সুলতানা রাজিয়া)',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&h=100&q=80',
+    mutualFriends: 12,
+    status: 'invited',
+    rewardEarnedTk: 0,
+  },
+];
+
+let currentUserProfile: UserProfile = {
+  name: 'Md. Rakib Hossain',
+  email: 'rakib.edu.bd@gmail.com',
+  institution: 'University of Dhaka',
+  jobType: 'bcs',
+  attemptedQuizCount: 42,
+  totalMarksScored: 86.5,
+  averageAccuracy: 84,
+  affiliateEarningsTk: 850,
+  referralCode: 'BCS2026RAKIB',
+};
+
+// Initialize and chain Hono router
 const app = new Hono()
   .use('*', logger())
   .use('*', cors())
@@ -323,66 +395,38 @@ const app = new Hono()
   .get('/health', (c) => {
     return c.json({
       status: 'ok',
+      service: 'QuizPulse Job Prep Backend (BCS / Bank / Govt)',
       timestamp: new Date().toISOString(),
-      version: '1.0.0',
-      service: 'QuizPulse Hono Backend',
     });
   })
   .get('/categories', (c) => {
-    const difficulty = c.req.query('difficulty');
-
-    let filtered = CATEGORIES;
-    if (difficulty && ['easy', 'medium', 'hard'].includes(difficulty)) {
-      filtered = CATEGORIES.filter((cat) => cat.difficulties.includes(difficulty as any));
-    }
-
     return c.json({
       success: true,
-      data: filtered,
-      total: filtered.length,
-      timestamp: new Date().toISOString(),
+      data: CATEGORIES,
+      total: CATEGORIES.length,
     });
   })
   .get('/quizzes/:id', (c) => {
     const id = c.req.param('id');
-    const category = CATEGORIES.find((cat) => cat.id === id);
-
-    if (!category) {
-      return c.json(
-        {
-          success: false,
-          error: `Quiz category '${id}' not found.`,
-        },
-        404
-      );
-    }
-
-    const rawQuestions = QUESTION_BANK[id] || [];
-    if (rawQuestions.length === 0) {
-      return c.json(
-        {
-          success: false,
-          error: `No questions available for quiz '${id}'.`,
-        },
-        404
-      );
-    }
+    const category = CATEGORIES.find((cat) => cat.id === id) || CATEGORIES[0];
+    const rawQuestions = QUESTION_BANK[category.id] || QUESTION_BANK['bank'];
 
     const quizPayload: QuizPayload = {
       id: category.id,
       title: category.title,
-      category: category.id,
+      category: category.id as any,
       description: category.description,
-      difficulty: category.difficulties[0],
-      timeLimitSeconds: rawQuestions.length * 25,
+      totalMarks: rawQuestions.length,
+      negativeMarkPerWrong: 0.25,
+      timeLimitSeconds: rawQuestions.length * 40,
       questions: rawQuestions.map((q) => ({
         id: q.id,
-        category: q.category,
-        difficulty: q.difficulty,
+        subject: q.subject,
+        subjectNameBn: q.subjectNameBn,
+        questionNumber: q.questionNumber,
         question: q.question,
-        codeSnippet: q.codeSnippet,
         options: q.options,
-        points: q.points,
+        marks: q.marks,
       })),
     };
 
@@ -399,74 +443,125 @@ const app = new Hono()
   })
   .post('/quizzes/submit', async (c) => {
     const body = (await c.req.json()) as SubmitQuizRequest;
-    const { quizId, answers = {}, timeSpentSeconds = 0 } = body;
+    const { quizId = 'bank', answers = {}, timeSpentSeconds = 120 } = body;
 
-    const category = CATEGORIES.find((cat) => cat.id === quizId);
-    const questions = QUESTION_BANK[quizId] || [];
-
-    if (!category || questions.length === 0) {
-      return c.json(
-        {
-          success: false,
-          error: `Invalid quizId '${quizId}' submitted.`,
-        },
-        400
-      );
-    }
+    const category = CATEGORIES.find((cat) => cat.id === quizId) || CATEGORIES[0];
+    const questions = QUESTION_BANK[category.id] || QUESTION_BANK['bank'];
 
     let correctCount = 0;
-    let incorrectCount = 0;
-    let pointsEarned = 0;
-    let totalPossiblePoints = 0;
+    let wrongCount = 0;
+    let skippedCount = 0;
 
     const review: QuestionReviewItem[] = questions.map((q) => {
       const selectedOptionId = answers[q.id] || null;
+      const isSkipped = !selectedOptionId;
       const isCorrect = selectedOptionId === q.correctOptionId;
-      totalPossiblePoints += q.points;
 
       if (isCorrect) {
         correctCount++;
-        pointsEarned += q.points;
+      } else if (isSkipped) {
+        skippedCount++;
       } else {
-        incorrectCount++;
+        wrongCount++;
       }
 
       return {
         questionId: q.id,
+        questionNumber: q.questionNumber,
+        subject: q.subject,
+        subjectNameBn: q.subjectNameBn,
         question: q.question,
-        codeSnippet: q.codeSnippet,
         selectedOptionId,
         correctOptionId: q.correctOptionId,
         isCorrect,
+        isSkipped,
         explanation: q.explanation,
         options: q.options,
       };
     });
 
     const totalQuestions = questions.length;
-    const answeredCount = Object.keys(answers).length;
-    const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
-    const passed = scorePercentage >= 70;
+    const attemptedCount = totalQuestions - skippedCount;
+    const rawScore = correctCount * 1;
+    const negativeMarks = wrongCount * 0.25;
+    const netScore = Math.max(0, +(rawScore - negativeMarks).toFixed(2));
+    const accuracyPercentage = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+
+    // Calculate pie chart percentages matching the sketch (Correct / Wrong / Skipped)
+    const correctPercentage = Math.round((correctCount / totalQuestions) * 100);
+    const wrongPercentage = Math.round((wrongCount / totalQuestions) * 100);
+    const skippedPercentage = Math.max(0, 100 - (correctPercentage + wrongPercentage));
 
     const response: SubmitQuizResponse = {
       quizId: category.id,
       title: category.title,
       totalQuestions,
-      answeredCount,
+      attemptedCount,
       correctCount,
-      incorrectCount,
-      scorePercentage,
-      pointsEarned,
-      totalPossiblePoints,
+      wrongCount,
+      skippedCount,
+      rawScore,
+      negativeMarks,
+      netScore,
+      accuracyPercentage,
       timeSpentSeconds,
-      passed,
+      meritRank: 4,
       completedAt: new Date().toISOString(),
+      pieChart: {
+        correctPercentage,
+        wrongPercentage,
+        skippedPercentage,
+      },
       review,
     };
+
+    // Update user stats
+    currentUserProfile.attemptedQuizCount += 1;
+    currentUserProfile.totalMarksScored = +(
+      currentUserProfile.totalMarksScored + netScore
+    ).toFixed(1);
 
     return c.json({
       success: true,
       data: response,
+    });
+  })
+  .get('/merit-list', (c) => {
+    return c.json({
+      success: true,
+      data: MERIT_LIST,
+      total: MERIT_LIST.length,
+      userRank: 4,
+    });
+  })
+  .get('/affiliate', (c) => {
+    return c.json({
+      success: true,
+      data: {
+        referralCode: currentUserProfile.referralCode,
+        referralLink: `https://quizpulse.app/ref/${currentUserProfile.referralCode}`,
+        totalEarnedTk: currentUserProfile.affiliateEarningsTk,
+        pendingTk: 150,
+        successfulReferrals: 17,
+        fbFriends: FB_FRIENDS,
+      },
+    });
+  })
+  .get('/user-profile', (c) => {
+    return c.json({
+      success: true,
+      data: currentUserProfile,
+    });
+  })
+  .post('/user-profile/update', async (c) => {
+    const updates = await c.req.json();
+    currentUserProfile = {
+      ...currentUserProfile,
+      ...updates,
+    };
+    return c.json({
+      success: true,
+      data: currentUserProfile,
     });
   });
 

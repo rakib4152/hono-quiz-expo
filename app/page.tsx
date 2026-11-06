@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   QueryClient,
   QueryClientProvider,
@@ -8,15 +8,20 @@ import {
   useMutation,
 } from '@tanstack/react-query';
 import confetti from 'canvas-confetti';
+import Image from 'next/image';
 import {
   Smartphone,
-  Code2,
+  GraduationCap,
+  Landmark,
+  Building2,
+  Briefcase,
+  Play,
+  Trophy,
+  Share2,
+  Settings as SettingsIcon,
   Flame,
-  Zap,
-  Gauge,
-  Layers,
   Clock,
-  HelpCircle,
+  Users,
   ChevronRight,
   ArrowLeft,
   CheckCircle2,
@@ -24,29 +29,30 @@ import {
   AlertTriangle,
   RotateCcw,
   Sparkles,
-  Trophy,
+  Award,
+  Wallet,
+  LogIn,
+  UserPlus,
   Copy,
   Check,
-  Server,
-  Play,
-  FileCode,
-  Terminal,
-  ExternalLink,
-  ShieldCheck,
-  Cpu,
-  Eye,
-  RefreshCw,
   BookOpen,
+  Terminal,
+  FileCode,
+  LayoutGrid,
+  Gift,
+  Search,
 } from 'lucide-react';
 import type {
   QuizCategory,
   QuizPayload,
   SubmitQuizRequest,
   SubmitQuizResponse,
-  Difficulty,
+  MeritStudent,
+  FacebookFriend,
+  UserProfile,
+  JobType,
 } from '@/src/types/quiz';
 
-// Stable QueryClient for client simulator
 const clientQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -56,49 +62,69 @@ const clientQueryClient = new QueryClient({
   },
 });
 
+type ScreenId =
+  | 'login'
+  | 'register'
+  | 'home'
+  | 'quiz'
+  | 'result'
+  | 'attempted'
+  | 'merit'
+  | 'affiliate'
+  | 'settings';
+
 export default function MobileShowcasePage() {
   return (
     <QueryClientProvider client={clientQueryClient}>
-      <MobileQuizApp />
+      <JobQuizApp />
     </QueryClientProvider>
   );
 }
 
-// -------------------------------------------------------------
-// Interactive Mobile Simulator + Developer Architecture Suite
-// -------------------------------------------------------------
-
-function MobileQuizApp() {
-  const [activeTab, setActiveTab] = useState<'simulator' | 'api-explorer' | 'files' | 'architecture'>('simulator');
-  const [activeScreen, setActiveScreen] = useState<'categories' | 'quiz' | 'result'>('categories');
-  const [activeQuizId, setActiveQuizId] = useState<string>('react-native');
+function JobQuizApp() {
+  const [activeScreen, setActiveScreen] = useState<ScreenId>('home');
+  const [activeTab, setActiveTab] = useState<'simulator' | 'wireframe' | 'api-explorer' | 'files'>('simulator');
+  const [activeQuizId, setActiveQuizId] = useState<string>('bank');
   const [lastSubmission, setLastSubmission] = useState<SubmitQuizResponse | null>(null);
+
+  // Wireframe 9 screens list matching the exact 3x3 layout in the user's sketch
+  const SCREENS_METADATA: { id: ScreenId; title: string; subtitle: string; row: number; col: number }[] = [
+    { id: 'login', title: '1. Login Screen', subtitle: 'Auth Screen (Name, Email, G/F)', row: 1, col: 1 },
+    { id: 'register', title: '2. Register Screen', subtitle: 'Name, Institution, Job Type', row: 1, col: 2 },
+    { id: 'home', title: '3. Home Screen', subtitle: 'Hero Area, ক্যাটাগরি (BCS/Bank)', row: 1, col: 3 },
+    { id: 'quiz', title: '4. Quiz Screen', subtitle: 'Bank/BCS Exam (Q.1, Q.2, A/B/C/D)', row: 2, col: 1 },
+    { id: 'result', title: '5. Result Screen', subtitle: 'Pie Chart (Correct/Wrong/Skipped)', row: 2, col: 2 },
+    { id: 'attempted', title: '6. Attempted Screen', subtitle: 'বাংলা/ইংরেজি/GK Tabs, Correct vs Wrong', row: 2, col: 3 },
+    { id: 'merit', title: '7. Merit List Screen', subtitle: '1., 2., 3., 4. Live Rank List', row: 3, col: 1 },
+    { id: 'affiliate', title: '8. Affiliate Screen', subtitle: 'Refer to a friend & FB Friend list', row: 3, col: 2 },
+    { id: 'settings', title: '9. Settings Screen', subtitle: 'Name, Attempted quiz, Total M., Affiliate tk', row: 3, col: 3 },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
-      {/* Top Engineering Navbar */}
-      <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-3.5">
+      {/* Top Header */}
+      <header className="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-3.5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Smartphone className="w-5 h-5 text-emerald-400" />
+                <GraduationCap className="w-5 h-5 text-emerald-400" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-white tracking-tight">QuizPulse Mobile</h1>
+                <h1 className="text-lg font-bold text-white tracking-tight">BCS & Job Prep Quiz</h1>
                 <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full">
-                  Expo SDK 51 + Hono RPC
+                  All 9 Wireframe Screens
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                NativeWind v4 • TanStack Query • TypeScript End-to-End Type Safety
+                BCS • Bank Job • Govt. Job • Private MNC Aptitude
               </p>
             </div>
           </div>
 
-          {/* Navigation Mode Switcher */}
+          {/* Navigation Controls */}
           <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 p-1 rounded-xl">
             <button
               onClick={() => setActiveTab('simulator')}
@@ -109,7 +135,19 @@ function MobileQuizApp() {
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
-              <span>Mobile Simulator</span>
+              <span>Interactive Phone</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('wireframe')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                activeTab === 'wireframe'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Wireframe Grid (3x3)</span>
             </button>
 
             <button
@@ -121,7 +159,7 @@ function MobileQuizApp() {
               }`}
             >
               <Terminal className="w-3.5 h-3.5" />
-              <span>Hono RPC Explorer</span>
+              <span>Hono RPC APIs</span>
             </button>
 
             <button
@@ -133,40 +171,28 @@ function MobileQuizApp() {
               }`}
             >
               <FileCode className="w-3.5 h-3.5" />
-              <span>Project Files</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('architecture')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'architecture'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Architecture Spec</span>
+              <span>Expo Source Files</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Container */}
       <main className="flex-1 max-w-7xl mx-auto w-full p-4 lg:p-8">
         {activeTab === 'simulator' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Mobile Simulator Viewport */}
+            {/* Phone Viewport */}
             <div className="lg:col-span-6 flex flex-col items-center">
               <div className="w-full max-w-[390px] relative">
-                {/* Device Frame */}
+                {/* Physical Phone Shell */}
                 <div className="relative rounded-[48px] bg-slate-900 border-[7px] border-slate-800 shadow-2xl shadow-emerald-500/10 overflow-hidden ring-1 ring-white/10">
-                  {/* Dynamic Island / Speaker Notch */}
+                  {/* Dynamic Island */}
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-36 bg-slate-950 rounded-b-2xl z-50 flex items-center justify-center gap-3">
                     <div className="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800" />
                     <div className="w-10 h-1 bg-slate-900 rounded-full" />
                   </div>
 
-                  {/* Mobile Status Bar */}
+                  {/* Status Bar */}
                   <div className="pt-2 px-7 pb-1 flex items-center justify-between text-[11px] font-semibold text-slate-400 bg-slate-950 border-b border-slate-900 select-none">
                     <span>9:41</span>
                     <div className="flex items-center gap-1.5">
@@ -177,29 +203,40 @@ function MobileQuizApp() {
                     </div>
                   </div>
 
-                  {/* Simulator Screen Content */}
-                  <div className="h-[700px] bg-slate-950 flex flex-col overflow-hidden relative">
-                    {activeScreen === 'categories' && (
-                      <SimulatorCategoriesScreen
-                        onSelectQuiz={(id) => {
+                  {/* Active Screen Viewport */}
+                  <div className="h-[680px] bg-slate-950 flex flex-col overflow-hidden relative">
+                    {activeScreen === 'login' && (
+                      <SimulatorLoginScreen
+                        onSuccess={() => setActiveScreen('home')}
+                        onGoRegister={() => setActiveScreen('register')}
+                      />
+                    )}
+
+                    {activeScreen === 'register' && (
+                      <SimulatorRegisterScreen
+                        onSuccess={() => setActiveScreen('home')}
+                        onGoLogin={() => setActiveScreen('login')}
+                      />
+                    )}
+
+                    {activeScreen === 'home' && (
+                      <SimulatorHomeScreen
+                        onStartExam={(id) => {
                           setActiveQuizId(id);
                           setActiveScreen('quiz');
                         }}
+                        onNavigate={(screen) => setActiveScreen(screen)}
                       />
                     )}
 
                     {activeScreen === 'quiz' && (
                       <SimulatorQuizScreen
                         quizId={activeQuizId}
-                        onBack={() => setActiveScreen('categories')}
+                        onBack={() => setActiveScreen('home')}
                         onComplete={(result) => {
                           setLastSubmission(result);
                           setActiveScreen('result');
-                          confetti({
-                            particleCount: 80,
-                            spread: 60,
-                            origin: { y: 0.6 },
-                          });
+                          confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
                         }}
                       />
                     )}
@@ -208,363 +245,513 @@ function MobileQuizApp() {
                       <SimulatorResultScreen
                         quizId={activeQuizId}
                         result={lastSubmission}
+                        onViewAttempted={() => setActiveScreen('attempted')}
+                        onViewMerit={() => setActiveScreen('merit')}
                         onRetake={() => setActiveScreen('quiz')}
-                        onGoHome={() => setActiveScreen('categories')}
+                        onGoHome={() => setActiveScreen('home')}
+                      />
+                    )}
+
+                    {activeScreen === 'attempted' && (
+                      <SimulatorAttemptedScreen
+                        result={lastSubmission}
+                        onBack={() => setActiveScreen('result')}
+                      />
+                    )}
+
+                    {activeScreen === 'merit' && (
+                      <SimulatorMeritScreen onBack={() => setActiveScreen('home')} />
+                    )}
+
+                    {activeScreen === 'affiliate' && (
+                      <SimulatorAffiliateScreen
+                        onBack={() => setActiveScreen('home')}
+                        onGoSettings={() => setActiveScreen('settings')}
+                      />
+                    )}
+
+                    {activeScreen === 'settings' && (
+                      <SimulatorSettingsScreen
+                        onBack={() => setActiveScreen('home')}
+                        onLogout={() => setActiveScreen('login')}
                       />
                     )}
                   </div>
 
+                  {/* Bottom Navigation Bar (Shown on Home, Merit, Affiliate, Settings) */}
+                  {['home', 'merit', 'affiliate', 'settings'].includes(activeScreen) && (
+                    <div className="bg-slate-950/95 border-t border-slate-900 grid grid-cols-4 py-2 px-2">
+                      <button
+                        onClick={() => setActiveScreen('home')}
+                        className={`flex flex-col items-center py-1 rounded-lg transition-colors ${
+                          activeScreen === 'home' ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <Landmark className="w-4 h-4" />
+                        <span className="text-[10px] font-bold mt-1">Home</span>
+                      </button>
+
+                      <button
+                        onClick={() => setActiveScreen('merit')}
+                        className={`flex flex-col items-center py-1 rounded-lg transition-colors ${
+                          activeScreen === 'merit' ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <Trophy className="w-4 h-4" />
+                        <span className="text-[10px] font-bold mt-1">Merit</span>
+                      </button>
+
+                      <button
+                        onClick={() => setActiveScreen('affiliate')}
+                        className={`flex flex-col items-center py-1 rounded-lg transition-colors ${
+                          activeScreen === 'affiliate' ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <Share2 className="w-4 h-4" />
+                        <span className="text-[10px] font-bold mt-1">Affiliate</span>
+                      </button>
+
+                      <button
+                        onClick={() => setActiveScreen('settings')}
+                        className={`flex flex-col items-center py-1 rounded-lg transition-colors ${
+                          activeScreen === 'settings' ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <SettingsIcon className="w-4 h-4" />
+                        <span className="text-[10px] font-bold mt-1">Settings</span>
+                      </button>
+                    </div>
+                  )}
+
                   {/* Home Bar Indicator */}
-                  <div className="h-5 bg-slate-950 flex items-center justify-center">
-                    <div className="w-32 h-1 bg-slate-700/80 rounded-full" />
+                  <div className="h-4 bg-slate-950 flex items-center justify-center">
+                    <div className="w-28 h-1 bg-slate-700/80 rounded-full" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Interactive Controls & Real-Time Inspection */}
+            {/* Right Column: Screen Switcher + Sketch Reference */}
             <div className="lg:col-span-6 space-y-6">
-              {/* Feature Highlights Card */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                  <h2 className="text-base font-bold text-white">Full-Stack Requirements Verified</h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
-                    <span className="font-semibold text-emerald-400 block mb-1">
-                      1. Hono RPC Client (`hc`)
-                    </span>
-                    <p className="text-slate-400 leading-relaxed">
-                      End-to-end typed client consuming <code className="text-slate-300">GET /api/categories</code>, <code className="text-slate-300">GET /api/quizzes/:id</code>, and <code className="text-slate-300">POST /api/quizzes/submit</code>.
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
-                    <span className="font-semibold text-emerald-400 block mb-1">
-                      2. TanStack React Query
-                    </span>
-                    <p className="text-slate-400 leading-relaxed">
-                      Cache keys, staleTime background re-validation, mutation pipelines, and optimistic result persistence.
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
-                    <span className="font-semibold text-emerald-400 block mb-1">
-                      3. NativeWind v4 & Tailwind
-                    </span>
-                    <p className="text-slate-400 leading-relaxed">
-                      Zero-StyleSheet rule enforced; all styling utilizes <code className="text-slate-300">className</code> on React Native primitives.
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
-                    <span className="font-semibold text-emerald-400 block mb-1">
-                      4. State Feedback & Guard
-                    </span>
-                    <p className="text-slate-400 leading-relaxed">
-                      Instant emerald-500 / rose-500 answer feedback, countdown timer, and mid-quiz exit confirmation modal.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Screen Quick-Navigation */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
-                <h3 className="text-sm font-bold text-white mb-3">Live Screen Navigation</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Jump directly to any Expo Router route in the phone simulator:
-                </p>
-                <div className="grid grid-cols-3 gap-2.5">
-                  <button
-                    onClick={() => setActiveScreen('categories')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
-                      activeScreen === 'categories'
-                        ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-                        : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
-                    }`}
-                  >
-                    <span className="text-[11px] block font-mono text-slate-500">app/index.tsx</span>
-                    <span className="text-xs font-bold block mt-0.5">Categories Screen</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveScreen('quiz')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
-                      activeScreen === 'quiz'
-                        ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-                        : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
-                    }`}
-                  >
-                    <span className="text-[11px] block font-mono text-slate-500">app/quiz/[id].tsx</span>
-                    <span className="text-xs font-bold block mt-0.5">Quiz Execution</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      if (!lastSubmission) {
-                        // Generate mock evaluation for instant viewing if none run yet
-                        setLastSubmission({
-                          quizId: activeQuizId,
-                          title: 'React Native & Expo Ecosystem',
-                          totalQuestions: 4,
-                          answeredCount: 4,
-                          correctCount: 3,
-                          incorrectCount: 1,
-                          scorePercentage: 75,
-                          pointsEarned: 60,
-                          totalPossiblePoints: 80,
-                          timeSpentSeconds: 42,
-                          passed: true,
-                          completedAt: new Date().toISOString(),
-                          review: [
-                            {
-                              questionId: 'rn-1',
-                              question: 'Which component in React Native is used to provide touch feedback on modern iOS & Android?',
-                              selectedOptionId: 'opt-a',
-                              correctOptionId: 'opt-a',
-                              isCorrect: true,
-                              explanation: '<Pressable> is the core component intended for interacting with touches in React Native.',
-                              options: [
-                                { id: 'opt-a', label: 'A', text: '<Pressable>' },
-                                { id: 'opt-b', label: 'B', text: '<Div>' },
-                              ],
-                            },
-                          ],
-                        });
-                      }
-                      setActiveScreen('result');
-                    }}
-                    className={`p-3 rounded-xl border text-left transition-all ${
-                      activeScreen === 'result'
-                        ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-                        : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
-                    }`}
-                  >
-                    <span className="text-[11px] block font-mono text-slate-500">app/quiz/result.tsx</span>
-                    <span className="text-xs font-bold block mt-0.5">Results & Review</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Live Hono Backend Status Badge */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+              {/* Screen Selector Grid */}
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h4 className="text-xs font-bold text-white">Live Hono API Service Active</h4>
-                    <p className="text-[11px] text-slate-400">
-                      Serving endpoints at <code className="text-emerald-400">/api/categories</code>, <code className="text-emerald-400">/api/quizzes/:id</code>
-                    </p>
+                    <h2 className="text-base font-bold text-white">Wireframe Screens (1-Click Switch)</h2>
+                    <p className="text-xs text-slate-400">All 9 screens digitized directly from your sketch:</p>
                   </div>
+                  <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                    Active: {activeScreen.toUpperCase()}
+                  </span>
                 </div>
-                <button
-                  onClick={() => setActiveTab('api-explorer')}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5"
-                >
-                  <span>Test Endpoints</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                </button>
+
+                <div className="grid grid-cols-3 gap-2.5">
+                  {SCREENS_METADATA.map((screen) => {
+                    const isActive = activeScreen === screen.id;
+                    return (
+                      <button
+                        key={screen.id}
+                        onClick={() => setActiveScreen(screen.id)}
+                        className={`p-3 rounded-2xl border text-left transition-all relative ${
+                          isActive
+                            ? 'bg-emerald-500/10 border-emerald-500 shadow-md ring-1 ring-emerald-500'
+                            : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                        }`}
+                      >
+                        <span
+                          className={`text-xs font-bold block truncate ${
+                            isActive ? 'text-emerald-400' : 'text-slate-200'
+                          }`}
+                        >
+                          {screen.title}
+                        </span>
+                        <span className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">
+                          {screen.subtitle}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Hand-Drawn Reference Image Viewer */}
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-emerald-400" /> Original User Sketch Reference
+                  </h3>
+                  <span className="text-[10px] text-slate-400">3x3 Grid Layout</span>
+                </div>
+                <div className="relative h-64 w-full rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 group">
+                  <Image
+                    src="/assets/aistudio/image_ff8fe701.png"
+                    alt="Original Sketch Wireframe"
+                    fill
+                    className="object-contain"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors pointer-events-none" />
+                </div>
+                <p className="text-[11px] text-slate-400 mt-2.5 leading-relaxed">
+                  Every section from your drawing (Login, Register, Home, Quiz, Result Pie Chart, Attempted Answers, Merit List, Affiliate, Settings) has been translated into production Expo and React Native screens.
+                </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Tab 2: Hono RPC API Live Explorer */}
-        {activeTab === 'api-explorer' && <HonoApiExplorer />}
+        {/* Tab 2: Wireframe Grid Mode (3x3 gallery of all screens) */}
+        {activeTab === 'wireframe' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+              <h2 className="text-lg font-bold text-white mb-1">3x3 Wireframe Matrix</h2>
+              <p className="text-xs text-slate-400">
+                Click any screen below to preview it directly in the interactive mobile device.
+              </p>
+            </div>
 
-        {/* Tab 3: Complete Project File Outputs */}
-        {activeTab === 'files' && <ProjectFilesViewer />}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {SCREENS_METADATA.map((s) => (
+                <div
+                  key={s.id}
+                  onClick={() => {
+                    setActiveScreen(s.id);
+                    setActiveTab('simulator');
+                  }}
+                  className="bg-slate-900 border border-slate-800 hover:border-emerald-500 rounded-3xl p-5 cursor-pointer transition-all hover:scale-[1.01] shadow-lg group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">
+                      {s.title}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-500 bg-slate-950 px-2 py-0.5 rounded">
+                      Row {s.row}, Col {s.col}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-4">{s.subtitle}</p>
+                  <div className="h-36 bg-slate-950 border border-slate-850 rounded-2xl flex items-center justify-center p-3 text-center">
+                    <span className="text-xs text-slate-500 group-hover:text-emerald-400 font-semibold flex items-center gap-1">
+                      Tap to open in Mobile Simulator <ChevronRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        {/* Tab 4: Architecture & Design Spec */}
-        {activeTab === 'architecture' && <ArchitectureSpec />}
+        {/* Tab 3: Hono RPC API Console */}
+        {activeTab === 'api-explorer' && <HonoExplorerTab />}
+
+        {/* Tab 4: Expo Source Files */}
+        {activeTab === 'files' && <ExpoFilesTab />}
       </main>
     </div>
   );
 }
 
 // -------------------------------------------------------------
-// Simulator Component: Categories Screen
+// Screen 1: Login Screen / Auth Screen
 // -------------------------------------------------------------
-function SimulatorCategoriesScreen({ onSelectQuiz }: { onSelectQuiz: (id: string) => void }) {
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | 'all'>('all');
+function SimulatorLoginScreen({
+  onSuccess,
+  onGoRegister,
+}: {
+  onSuccess: () => void;
+  onGoRegister: () => void;
+}) {
+  const [name, setName] = useState('Md. Rakib Hossain');
+  const [email, setEmail] = useState('rakib.edu.bd@gmail.com');
 
-  const { data: categories = [], isLoading, isError, refetch } = useQuery<QuizCategory[]>({
-    queryKey: ['categories', selectedDifficulty],
+  return (
+    <div className="flex-1 flex flex-col bg-slate-950 px-5 pt-8 pb-6 justify-center select-none overflow-y-auto">
+      <div className="text-center mb-6">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2">
+          <LogIn className="w-6 h-6 text-emerald-400" />
+        </div>
+        <h2 className="text-lg font-bold text-white tracking-tight">Login Screen</h2>
+        <p className="text-[11px] text-slate-400">Auth Screen • BCS & Job Exam Prep</p>
+      </div>
+
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-4 shadow-xl">
+        <div className="mb-3">
+          <label className="text-[11px] font-bold text-slate-300 block mb-1">Name:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="text-[11px] font-bold text-slate-300 block mb-1">Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+          />
+        </div>
+
+        <button
+          onClick={onSuccess}
+          className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs shadow-md shadow-emerald-500/20 mb-4 transition-all"
+        >
+          Sign In
+        </button>
+
+        <div className="pt-3 border-t border-slate-800 text-center">
+          <span className="text-[10px] font-semibold text-slate-400 block mb-2">Sign in with</span>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={onSuccess}
+              className="w-10 h-10 rounded-full bg-slate-950 border border-slate-700 hover:border-emerald-500 text-white font-bold text-sm flex items-center justify-center"
+            >
+              G
+            </button>
+            <button
+              onClick={onSuccess}
+              className="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 hover:bg-blue-500 text-white font-bold text-sm flex items-center justify-center"
+            >
+              f
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-center text-[11px] text-slate-400">
+        New candidate?{' '}
+        <button onClick={onGoRegister} className="text-emerald-400 font-bold hover:underline">
+          Go to Register Screen
+        </button>
+      </p>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Screen 2: Register Screen
+// -------------------------------------------------------------
+function SimulatorRegisterScreen({
+  onSuccess,
+  onGoLogin,
+}: {
+  onSuccess: () => void;
+  onGoLogin: () => void;
+}) {
+  const [name, setName] = useState('Md. Rakib Hossain');
+  const [institution, setInstitution] = useState('University of Dhaka');
+  const [jobType, setJobType] = useState<JobType>('bcs');
+
+  return (
+    <div className="flex-1 flex flex-col bg-slate-950 px-5 pt-8 pb-6 justify-center select-none overflow-y-auto">
+      <div className="text-center mb-5">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2">
+          <UserPlus className="w-6 h-6 text-emerald-400" />
+        </div>
+        <h2 className="text-lg font-bold text-white tracking-tight">Register Screen</h2>
+        <p className="text-[11px] text-slate-400">Create Candidate Account</p>
+      </div>
+
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-4 shadow-xl">
+        <div className="mb-2.5">
+          <label className="text-[11px] font-bold text-slate-300 block mb-1">Name:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="text-[11px] font-bold text-slate-300 block mb-1">Institution:</label>
+          <input
+            type="text"
+            value={institution}
+            onChange={(e) => setInstitution(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+          />
+        </div>
+
+        {/* Job Type Selector matching sketch box: [ BCS | Bank | Private | Govt. Job ] */}
+        <div className="mb-4">
+          <label className="text-[11px] font-bold text-slate-300 block mb-2">Job Type:</label>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { id: 'bcs', label: 'BCS' },
+              { id: 'bank', label: 'Bank' },
+              { id: 'govt', label: 'Govt. Job' },
+              { id: 'private', label: 'Private' },
+            ].map((j) => (
+              <button
+                key={j.id}
+                type="button"
+                onClick={() => setJobType(j.id as JobType)}
+                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-left flex items-center justify-between ${
+                  jobType === j.id
+                    ? 'bg-emerald-950/50 border-emerald-500 text-emerald-400'
+                    : 'bg-slate-950 border-slate-800 text-slate-300'
+                }`}
+              >
+                <span>{j.label}</span>
+                {jobType === j.id && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={onSuccess}
+          className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs shadow-md shadow-emerald-500/20 transition-all"
+        >
+          Complete Registration
+        </button>
+      </div>
+
+      <p className="text-center text-[11px] text-slate-400">
+        Already registered?{' '}
+        <button onClick={onGoLogin} className="text-emerald-400 font-bold hover:underline">
+          Back to Login
+        </button>
+      </p>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Screen 3: Home Screen
+// -------------------------------------------------------------
+function SimulatorHomeScreen({
+  onStartExam,
+  onNavigate,
+}: {
+  onStartExam: (id: string) => void;
+  onNavigate: (s: ScreenId) => void;
+}) {
+  const { data: categories = [] } = useQuery<QuizCategory[]>({
+    queryKey: ['categories'],
     queryFn: async () => {
-      const url = selectedDifficulty === 'all' ? '/api/categories' : `/api/categories?difficulty=${selectedDifficulty}`;
-      const res = await fetch(url);
+      const res = await fetch('/api/categories');
       const json = await res.json();
       return json.data;
     },
   });
 
-  const getIcon = (name: string) => {
-    switch (name) {
-      case 'Smartphone':
-        return <Smartphone className="w-5 h-5 text-emerald-400" />;
-      case 'Code2':
-        return <Code2 className="w-5 h-5 text-blue-400" />;
-      case 'Flame':
-        return <Flame className="w-5 h-5 text-amber-400" />;
-      case 'Zap':
-        return <Zap className="w-5 h-5 text-violet-400" />;
-      case 'Gauge':
-        return <Gauge className="w-5 h-5 text-rose-400" />;
-      case 'Layers':
-        return <Layers className="w-5 h-5 text-cyan-400" />;
-      default:
-        return <Code2 className="w-5 h-5 text-emerald-400" />;
-    }
-  };
+  const { data: profile } = useQuery<UserProfile>({
+    queryKey: ['user-profile'],
+    queryFn: async () => {
+      const res = await fetch('/api/user-profile');
+      const json = await res.json();
+      return json.data;
+    },
+  });
 
   return (
     <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto px-4 pt-3 pb-8 select-none">
-      {/* Top Header */}
+      {/* Top Candidate Bar */}
       <div className="flex items-center justify-between mt-2 mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-bold text-emerald-400 text-sm">
+            {profile?.name ? profile.name.charAt(0) : 'R'}
           </div>
           <div>
-            <h2 className="text-base font-bold text-white tracking-tight">QuizPulse</h2>
-            <p className="text-[10px] text-slate-400">Hono RPC & Expo Frontend</p>
+            <h3 className="text-xs font-bold text-white">{profile?.name || 'Md. Rakib Hossain'}</h3>
+            <p className="text-[10px] text-slate-400">
+              {profile?.institution || 'University of Dhaka'} • {profile?.jobType?.toUpperCase() || 'BCS'}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-full px-2.5 py-1">
+        <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-full px-2.5 py-1">
           <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-          <span className="text-[11px] font-semibold text-amber-400">3 Day Streak</span>
+          <span className="text-[10px] font-semibold text-amber-400">5 Days</span>
         </div>
       </div>
 
-      {/* Hero Banner */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-850 border border-slate-800 rounded-2xl p-4 mb-4 shadow-lg">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-            <Sparkles className="w-3 h-3" /> Question Arena
+      {/* Hero Area matching sketch */}
+      <div className="bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-2xl p-4 mb-4 shadow-lg">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded-full">
+            Hero Area • Live Exam
           </span>
-          <span className="text-[9px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-            Live RPC
+          <span className="text-[10px] text-slate-400 flex items-center gap-1">
+            <Users className="w-3 h-3 text-slate-400" /> 1,420 Enrolled
           </span>
         </div>
-        <p className="text-sm font-bold text-white leading-snug mb-1">
-          Level up your mobile engineering
-        </p>
-        <p className="text-[11px] text-slate-400 mb-3 leading-relaxed">
-          Curated interactive challenges covering Fabric, Hono Edge, and TanStack caching.
+        <h4 className="text-sm font-bold text-white mb-1">
+          47th BCS & Combined Bank Mock Test
+        </h4>
+        <p className="text-[11px] text-slate-400 leading-relaxed mb-3">
+          বাংলা, ইংরেজি ও সাধারণ জ্ঞান সহ নেগেটিভ মার্কিং স্পেশাল মডেল টেস্ট।
         </p>
 
-        <div className="grid grid-cols-3 pt-2.5 border-t border-slate-800/80 text-center">
-          <div>
-            <span className="text-sm font-bold text-white">{categories.length}</span>
-            <span className="text-[10px] text-slate-400 block">Topics</span>
-          </div>
-          <div className="border-x border-slate-800">
-            <span className="text-sm font-bold text-emerald-400">
-              {categories.reduce((acc, c) => acc + c.totalQuestions, 0)}
-            </span>
-            <span className="text-[10px] text-slate-400 block">Questions</span>
-          </div>
-          <div>
-            <span className="text-sm font-bold text-cyan-400">
-              {categories.reduce((acc, c) => acc + c.estimatedMinutes, 0)}m
-            </span>
-            <span className="text-[10px] text-slate-400 block">Practice</span>
-          </div>
+        <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+          <span className="text-[10px] text-slate-400 flex items-center gap-1">
+            <Clock className="w-3 h-3 text-emerald-400" /> 10 Mins • 6 Qs
+          </span>
+          <button
+            onClick={() => onStartExam('bcs')}
+            className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 shadow-md"
+          >
+            <Play className="w-3 h-3 fill-slate-950" /> Start Exam
+          </button>
         </div>
       </div>
 
-      {/* Difficulty Filter Chips */}
+      {/* ক্যাটাগরি (Categories) matching sketch */}
       <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-            Difficulty Filter
-          </span>
-          <span className="text-[10px] text-slate-500">{categories.length} modules</span>
+        <div className="flex items-center justify-between mb-2.5">
+          <h4 className="text-sm font-bold text-white tracking-tight">ক্যাটাগরি</h4>
+          <span className="text-[10px] text-slate-400">Select Exam Track</span>
         </div>
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {(['all', 'easy', 'medium', 'hard'] as const).map((diff) => (
+
+        {/* 4 Circle Icons matching sketch: [ BCS ] [ Bank ] [ Govt. Job ] [ Private ] */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          {[
+            { id: 'bcs', label: 'BCS', labelBn: 'বিসিএস' },
+            { id: 'bank', label: 'Bank', labelBn: 'ব্যাংক' },
+            { id: 'govt', label: 'Govt. Job', labelBn: 'সরকারি' },
+            { id: 'private', label: 'Private', labelBn: 'প্রাইভেট' },
+          ].map((cat) => (
             <button
-              key={diff}
-              onClick={() => setSelectedDifficulty(diff)}
-              className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all border whitespace-nowrap ${
-                selectedDifficulty === diff
-                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
-                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-              }`}
+              key={cat.id}
+              onClick={() => onStartExam(cat.id)}
+              className="flex flex-col items-center group active:scale-95"
             >
-              {diff === 'all' ? 'All Levels' : diff.charAt(0).toUpperCase() + diff.slice(1)}
+              <div className="w-13 h-13 rounded-full bg-slate-900 border-2 border-slate-800 group-hover:border-emerald-500 flex items-center justify-center mb-1 shadow-md">
+                <Landmark className="w-5 h-5 text-emerald-400" />
+              </div>
+              <span className="text-[11px] font-bold text-white">{cat.label}</span>
+              <span className="text-[9px] text-slate-500">{cat.labelBn}</span>
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Category List */}
-      <div className="space-y-2.5 flex-1">
-        <span className="text-xs font-bold text-white block mb-1">Available Topics</span>
-
-        {isLoading ? (
-          <div className="py-12 flex flex-col items-center justify-center">
-            <RefreshCw className="w-5 h-5 text-emerald-400 animate-spin mb-2" />
-            <span className="text-xs text-slate-400">Fetching topics via Hono RPC...</span>
-          </div>
-        ) : isError ? (
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-center">
-            <p className="text-xs text-rose-400 mb-2">Failed to load categories</p>
+        {/* Topic List Cards */}
+        <div className="space-y-2">
+          {categories.map((c) => (
             <button
-              onClick={() => refetch()}
-              className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[11px] font-bold"
+              key={c.id}
+              onClick={() => onStartExam(c.id)}
+              className="w-full text-left bg-slate-900 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex items-center justify-between transition-all"
             >
-              Retry
-            </button>
-          </div>
-        ) : (
-          categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => onSelectQuiz(cat.id)}
-              className="w-full text-left bg-slate-900/90 border border-slate-800 hover:border-slate-700 active:scale-[0.98] rounded-2xl p-3.5 transition-all flex items-start gap-3 group"
-            >
-              <div className="w-10 h-10 rounded-xl bg-slate-800/90 border border-slate-700/60 flex items-center justify-center shrink-0 mt-0.5">
-                {getIcon(cat.iconName)}
+              <div>
+                <h5 className="text-xs font-bold text-white">{c.title}</h5>
+                <p className="text-[10px] text-slate-400">{c.titleBn}</p>
               </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-1 mb-1">
-                  <h4 className="text-xs font-bold text-white truncate group-hover:text-emerald-400 transition-colors">
-                    {cat.title}
-                  </h4>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 shrink-0" />
-                </div>
-                <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed mb-2.5">
-                  {cat.description}
-                </p>
-
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] font-semibold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md flex items-center gap-1">
-                    <HelpCircle className="w-2.5 h-2.5 text-slate-400" />
-                    {cat.totalQuestions} Qs
-                  </span>
-                  <span className="text-[10px] font-semibold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md flex items-center gap-1">
-                    <Clock className="w-2.5 h-2.5 text-slate-400" />
-                    ~{cat.estimatedMinutes}m
-                  </span>
-                  <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded uppercase">
-                    {cat.difficulties[0]}
-                  </span>
-                </div>
-              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
             </button>
-          ))
-        )}
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
 // -------------------------------------------------------------
-// Simulator Component: Quiz Execution Screen
+// Screen 4: Quiz Screen
 // -------------------------------------------------------------
 function SimulatorQuizScreen({
   quizId,
@@ -577,58 +764,23 @@ function SimulatorQuizScreen({
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(25);
-  const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(180);
+  const [timeSpent, setTimeSpent] = useState(0);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Fetch full quiz payload
-  const { data, isLoading, isError } = useQuery<{
-    quiz: QuizPayload;
-    feedbackKey: Record<string, string>;
-  }>({
+  const { data } = useQuery<{ quiz: QuizPayload }>({
     queryKey: ['quiz', quizId],
     queryFn: async () => {
       const res = await fetch(`/api/quizzes/${quizId}`);
       const json = await res.json();
-      return { quiz: json.data, feedbackKey: json.feedbackKey };
+      return { quiz: json.data };
     },
   });
 
   const quiz = data?.quiz;
-  const feedbackKey = data?.feedbackKey || {};
-  const questions = useMemo(() => quiz?.questions || [], [quiz]);
-  const currentQuestion = questions[currentIndex];
-  const totalQuestions = questions.length;
-  const progressPercent = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
+  const questions = quiz?.questions || [];
+  const currentQ = questions[currentIndex];
 
-  // Countdown timer
-  useEffect(() => {
-    if (!currentQuestion || isAnswered || isLoading) return;
-
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          setIsAnswered(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-      setTotalTimeSpent((t) => t + 1);
-    }, 1000);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [currentIndex, isAnswered, isLoading, currentQuestion]);
-
-  // Submit Mutation
   const submitMutation = useMutation<SubmitQuizResponse, Error, SubmitQuizRequest>({
     mutationFn: async (payload) => {
       const res = await fetch('/api/quizzes/submit', {
@@ -644,51 +796,35 @@ function SimulatorQuizScreen({
     },
   });
 
-  const handleSelectOption = (optionId: string) => {
-    if (isAnswered) return;
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    setSelectedOption(optionId);
-    setIsAnswered(true);
-
+  const handleSelectOption = (optId: string) => {
+    if (!currentQ) return;
     setAnswers((prev) => ({
       ...prev,
-      [currentQuestion.id]: optionId,
+      [currentQ.id]: optId,
     }));
   };
 
-  const handleNext = () => {
-    if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex((prev) => prev + 1);
-      setSelectedOption(null);
-      setIsAnswered(false);
-      setTimeLeft(25);
-    } else {
-      // Final question -> Submit to Hono
-      submitMutation.mutate({
-        quizId,
-        answers,
-        timeSpentSeconds: totalTimeSpent,
-      });
-    }
+  const handleFinish = () => {
+    submitMutation.mutate({
+      quizId,
+      answers,
+      timeSpentSeconds: timeSpent,
+    });
   };
 
-  if (isLoading || !currentQuestion) {
+  if (!quiz || !currentQ) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <RefreshCw className="w-7 h-7 text-emerald-400 animate-spin mb-3" />
-        <p className="text-xs font-bold text-white">Loading Question Bank...</p>
-        <p className="text-[11px] text-slate-400 mt-1">Connecting to Hono RPC client</p>
+      <div className="flex-1 flex items-center justify-center text-xs text-slate-400">
+        Loading Question Paper...
       </div>
     );
   }
 
-  const correctOptionId = feedbackKey[currentQuestion.id];
-  const isCorrectSelection = selectedOption === correctOptionId;
+  const selectedOptionId = answers[currentQ.id];
 
   return (
     <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto select-none relative">
-      {/* Top Navbar */}
+      {/* Top Navbar matching sketch: "Bank" (Category Title) */}
       <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-900 bg-slate-950/90">
         <button
           onClick={() => setShowExitConfirm(true)}
@@ -698,191 +834,113 @@ function SimulatorQuizScreen({
         </button>
 
         <div className="text-center">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
-            {quiz?.title}
+          <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
+            {quiz.title}
           </span>
           <span className="text-xs font-bold text-white">
-            Question {currentIndex + 1} of {totalQuestions}
+            Q.{currentQ.questionNumber} of {questions.length}
           </span>
         </div>
 
-        {/* Countdown Timer Badge */}
-        <div
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-bold ${
-            timeLeft <= 5
-              ? 'bg-rose-500/20 border-rose-500/40 text-rose-400'
-              : timeLeft <= 10
-              ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-              : 'bg-slate-900 border-slate-800 text-emerald-400'
-          }`}
-        >
+        <div className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-slate-800 bg-slate-900 text-emerald-400 text-[11px] font-mono font-bold">
           <Clock className="w-3 h-3" />
-          <span>{timeLeft}s</span>
+          <span>{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="w-full bg-slate-900 h-1">
-        <div
-          className="bg-emerald-500 h-full transition-all duration-300"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-
-      {/* Screen Body */}
+      {/* Question Cards matching sketch: Q.1, Q.2 */}
       <div className="flex-1 p-4 pb-8 flex flex-col justify-between">
         <div>
-          {/* Metadata Badges */}
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center gap-1">
-              <Sparkles className="w-2.5 h-2.5" /> +{currentQuestion.points} Points
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-4 shadow-md">
+            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded uppercase block mb-1.5 w-fit">
+              Q.{currentQ.questionNumber} • {currentQ.subjectNameBn}
             </span>
-            <span className="text-[10px] font-semibold text-slate-400 bg-slate-900 px-2 py-0.5 rounded uppercase">
-              {currentQuestion.difficulty}
-            </span>
+            <h3 className="text-xs font-bold text-white leading-relaxed">{currentQ.question}</h3>
           </div>
 
-          {/* Question Text */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-3.5 shadow-md">
-            <h3 className="text-xs font-bold text-white leading-relaxed">
-              {currentQuestion.question}
-            </h3>
-
-            {/* Code Snippet */}
-            {currentQuestion.codeSnippet && (
-              <div className="mt-2.5 bg-slate-950 border border-slate-800 rounded-xl p-2.5 font-mono text-[10px] text-emerald-300 overflow-x-auto">
-                <pre>{currentQuestion.codeSnippet}</pre>
-              </div>
-            )}
-          </div>
-
-          {/* Options List with NativeWind immediate feedback */}
-          <div className="space-y-2 mb-3">
-            {currentQuestion.options.map((opt) => {
-              const isSelected = selectedOption === opt.id;
-              const isCorrect = opt.id === correctOptionId;
-
-              let cardClasses = 'bg-slate-900/90 border-slate-800 hover:border-slate-700 text-slate-300';
-              let badgeClasses = 'bg-slate-800 text-slate-400';
-              let iconElement = null;
-
-              if (isAnswered) {
-                if (isCorrect) {
-                  // emerald-500 for correct answers
-                  cardClasses = 'bg-emerald-950/40 border-emerald-500 text-emerald-200 font-semibold';
-                  badgeClasses = 'bg-emerald-500 text-slate-950 font-bold';
-                  iconElement = <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />;
-                } else if (isSelected && !isCorrect) {
-                  // rose-500 for incorrect options upon selection
-                  cardClasses = 'bg-rose-950/40 border-rose-500 text-rose-200 font-semibold';
-                  badgeClasses = 'bg-rose-500 text-white font-bold';
-                  iconElement = <XCircle className="w-4 h-4 text-rose-400 shrink-0" />;
-                } else {
-                  cardClasses = 'bg-slate-900/40 border-slate-900 text-slate-500 opacity-40';
-                }
-              }
-
+          {/* Options matching sketch: A. B. C. D. */}
+          <div className="space-y-2 mb-4">
+            {currentQ.options.map((opt) => {
+              const isSelected = selectedOptionId === opt.id;
               return (
                 <button
                   key={opt.id}
-                  disabled={isAnswered}
                   onClick={() => handleSelectOption(opt.id)}
-                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between gap-2.5 ${cardClasses}`}
+                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between gap-2.5 ${
+                    isSelected
+                      ? 'bg-emerald-950/40 border-emerald-500 text-emerald-200 shadow-md'
+                      : 'bg-slate-900/90 border-slate-800 text-slate-300 hover:border-slate-700'
+                  }`}
                 >
                   <div className="flex items-center gap-2.5 flex-1 min-w-0">
                     <span
-                      className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] shrink-0 ${badgeClasses}`}
+                      className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                        isSelected ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'
+                      }`}
                     >
-                      {opt.label}
+                      {opt.label}.
                     </span>
-                    <span className="text-xs leading-snug break-words flex-1">{opt.text}</span>
+                    <span className="text-xs leading-snug">{opt.text}</span>
                   </div>
-                  {iconElement}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400" />}
                 </button>
               );
             })}
           </div>
-
-          {/* Immediate State Feedback Banner */}
-          {isAnswered && (
-            <div
-              className={`p-3 rounded-xl border mb-3 text-xs ${
-                isCorrectSelection
-                  ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300'
-                  : 'bg-rose-950/30 border-rose-500/40 text-rose-300'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 font-bold mb-0.5">
-                {isCorrectSelection ? (
-                  <>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Correct! +{currentQuestion.points} points</span>
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="w-3.5 h-3.5 text-rose-400" />
-                    <span>Incorrect — Review highlighted correct option</span>
-                  </>
-                )}
-              </div>
-              <p className="text-[11px] text-slate-300">
-                {isCorrectSelection
-                  ? 'Great accuracy! Architecture principles applied correctly.'
-                  : 'Review the emerald card above to study the correct implementation.'}
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* Action Button: Next or Submit */}
-        {isAnswered && (
-          <button
-            onClick={handleNext}
-            disabled={submitMutation.isPending}
-            className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 active:scale-[0.99] transition-all"
-          >
-            {submitMutation.isPending ? (
-              <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
-            ) : (
-              <>
-                <span>
-                  {currentIndex < totalQuestions - 1 ? 'Next Question' : 'Submit & View Results'}
-                </span>
-                <ChevronRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
-        )}
+        {/* Buttons */}
+        <div className="flex items-center justify-between gap-2 pt-2">
+          {currentIndex > 0 && (
+            <button
+              onClick={() => setCurrentIndex((i) => i - 1)}
+              className="py-2.5 px-4 bg-slate-900 border border-slate-800 text-slate-300 rounded-xl text-xs font-semibold"
+            >
+              Previous
+            </button>
+          )}
+
+          {currentIndex < questions.length - 1 ? (
+            <button
+              onClick={() => setCurrentIndex((i) => i + 1)}
+              className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-md"
+            >
+              <span>Next Q.{currentIndex + 2}</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              onClick={handleFinish}
+              disabled={submitMutation.isPending}
+              className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-md"
+            >
+              Submit Exam
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Confirmation Modal when user attempts to back out mid-quiz */}
       {showExitConfirm && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-xs bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl text-center">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto mb-3">
-              <AlertTriangle className="w-5 h-5 text-amber-400" />
-            </div>
-            <h4 className="text-sm font-bold text-white mb-1">Abandon Current Quiz?</h4>
-            <p className="text-[11px] text-slate-400 mb-4 leading-relaxed">
-              You are currently on Question {currentIndex + 1} of {totalQuestions}. If you exit
-              now, your answers for this attempt will be lost.
-            </p>
+        <div className="absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-xs bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+            <AlertTriangle className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+            <h4 className="text-sm font-bold text-white mb-1">Exit Ongoing Exam?</h4>
+            <p className="text-[11px] text-slate-400 mb-4">Answers will be evaluated with negative marking.</p>
             <div className="space-y-2">
               <button
                 onClick={() => setShowExitConfirm(false)}
                 className="w-full py-2 bg-emerald-500 text-slate-950 rounded-xl text-xs font-bold"
               >
-                Continue Quiz
+                Continue
               </button>
               <button
                 onClick={() => {
                   setShowExitConfirm(false);
-                  if (timerRef.current) clearInterval(timerRef.current);
                   onBack();
                 }}
-                className="w-full py-2 bg-slate-800 border border-slate-700 text-rose-400 rounded-xl text-xs font-semibold"
+                className="w-full py-2 bg-slate-800 text-rose-400 rounded-xl text-xs"
               >
-                Exit Arena
+                Exit to Home
               </button>
             </div>
           </div>
@@ -893,173 +951,97 @@ function SimulatorQuizScreen({
 }
 
 // -------------------------------------------------------------
-// Simulator Component: Results & Explanation Screen
+// Screen 5: Result Screen (Pie Chart with Correct / Wrong / Skipped)
 // -------------------------------------------------------------
 function SimulatorResultScreen({
   quizId,
   result,
+  onViewAttempted,
+  onViewMerit,
   onRetake,
   onGoHome,
 }: {
   quizId: string;
   result: SubmitQuizResponse | null;
+  onViewAttempted: () => void;
+  onViewMerit: () => void;
   onRetake: () => void;
   onGoHome: () => void;
 }) {
-  const score = result?.scorePercentage ?? 75;
-  const passed = score >= 70;
-  const reviewList = result?.review || [];
+  const correctCount = result?.correctCount ?? 4;
+  const wrongCount = result?.wrongCount ?? 1;
+  const skippedCount = result?.skippedCount ?? 1;
+  const totalQuestions = result?.totalQuestions ?? 6;
+  const netScore = result?.netScore ?? 3.75;
+
+  const correctPct = Math.round((correctCount / totalQuestions) * 100);
+  const wrongPct = Math.round((wrongCount / totalQuestions) * 100);
+  const skippedPct = 100 - (correctPct + wrongPct);
 
   return (
     <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto px-4 pt-4 pb-8 select-none">
-      {/* Trophy Header */}
       <div className="text-center mt-2 mb-4">
-        <div
-          className={`w-12 h-12 rounded-2xl mx-auto flex items-center justify-center mb-2 border ${
-            passed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-amber-500/10 border-amber-500/30'
-          }`}
-        >
-          <Trophy className={`w-6 h-6 ${passed ? 'text-emerald-400' : 'text-amber-400'}`} />
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2">
+          <Trophy className="w-6 h-6 text-emerald-400" />
         </div>
-        <h2 className="text-base font-bold text-white tracking-tight">Quiz Evaluation</h2>
-        <p className="text-[10px] text-slate-400">{result?.title || 'Engineering Assessment'}</p>
+        <h2 className="text-base font-bold text-white tracking-tight">Result Screen</h2>
+        <p className="text-[10px] text-slate-400">Score & Negative Marks</p>
       </div>
 
-      {/* Score Summary Box */}
+      {/* Big Pie Chart Visualization Card matching sketch */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-4 text-center shadow-lg">
-        <div className="w-24 h-24 rounded-full border-4 border-slate-800 mx-auto flex items-center justify-center mb-3">
-          <div
-            className={`w-20 h-20 rounded-full flex flex-col items-center justify-center border-2 ${
-              passed
-                ? 'border-emerald-500 bg-emerald-950/20 text-emerald-400'
-                : 'border-amber-500 bg-amber-950/20 text-amber-400'
-            }`}
-          >
-            <span className="text-xl font-black text-white">{score}%</span>
-            <span className="text-[9px] uppercase tracking-wider font-semibold text-slate-400">
-              Accuracy
-            </span>
-          </div>
-        </div>
-
-        <span
-          className={`inline-block px-3 py-0.5 rounded-full text-[10px] font-bold border mb-3 ${
-            passed
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-              : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-          }`}
-        >
-          {passed ? 'Passed Challenge (>= 70%)' : 'Needs Practice (< 70%)'}
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-3">
+          Pie Chart Representation (Correct / Wrong)
         </span>
 
+        {/* Graphical Ring representation matching the circle drawn in the sketch */}
+        <div className="w-32 h-32 rounded-full border-4 border-slate-800 mx-auto flex items-center justify-center relative mb-4">
+          <div className="w-24 h-24 rounded-full border-4 border-emerald-500 bg-emerald-950/20 flex flex-col items-center justify-center">
+            <span className="text-2xl font-black text-white">{netScore}</span>
+            <span className="text-[9px] font-bold text-emerald-400 uppercase">Net Marks</span>
+          </div>
+        </div>
+
+        {/* Pie Legend matching sketch: Correct / Wrong */}
         <div className="grid grid-cols-3 pt-2.5 border-t border-slate-800 text-center">
           <div>
-            <span className="text-xs font-bold text-emerald-400">
-              {result?.correctCount ?? 0} / {result?.totalQuestions ?? 0}
-            </span>
-            <span className="text-[10px] text-slate-400 block">Correct</span>
+            <span className="text-xs font-bold text-emerald-400">{correctCount} ({correctPct}%)</span>
+            <span className="text-[10px] text-slate-400 block font-semibold underline">Correct</span>
           </div>
           <div className="border-x border-slate-800">
-            <span className="text-xs font-bold text-white">{result?.timeSpentSeconds ?? 0}s</span>
-            <span className="text-[10px] text-slate-400 block">Time Spent</span>
+            <span className="text-xs font-bold text-rose-400">{wrongCount} ({wrongPct}%)</span>
+            <span className="text-[10px] text-slate-400 block font-semibold underline">Wrong</span>
           </div>
           <div>
-            <span className="text-xs font-bold text-amber-400">+{result?.pointsEarned ?? 0}</span>
-            <span className="text-[10px] text-slate-400 block">Points</span>
+            <span className="text-xs font-bold text-slate-300">{skippedCount} ({skippedPct}%)</span>
+            <span className="text-[10px] text-slate-400 block">Skipped</span>
           </div>
         </div>
       </div>
 
-      {/* Question Review List & Explanations */}
-      <div className="space-y-3 mb-4 flex-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-white flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5 text-emerald-400" /> Question Explanations
-          </span>
-          <span className="text-[10px] text-slate-400">{reviewList.length} reviews</span>
-        </div>
+      {/* Action Buttons to Attempted Screen & Merit List from Sketch */}
+      <div className="space-y-2 mb-3">
+        <button
+          onClick={onViewAttempted}
+          className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md"
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>Attempted Answer Screen (উত্তরমালা)</span>
+        </button>
 
-        {reviewList.map((item, idx) => {
-          const selectedOpt = item.options.find((o) => o.id === item.selectedOptionId);
-          const correctOpt = item.options.find((o) => o.id === item.correctOptionId);
+        <button
+          onClick={onViewMerit}
+          className="w-full py-2.5 bg-slate-900 border border-slate-800 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5"
+        >
+          <Award className="w-3.5 h-3.5 text-amber-400" />
+          <span>Merit List Screen (মেধাতালিকা)</span>
+        </button>
 
-          return (
-            <div
-              key={item.questionId}
-              className={`p-3 rounded-xl border text-xs ${
-                item.isCorrect
-                  ? 'bg-slate-900/90 border-slate-800'
-                  : 'bg-slate-900/90 border-rose-900/40'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">
-                  Q{idx + 1}
-                </span>
-                <span
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 ${
-                    item.isCorrect
-                      ? 'bg-emerald-500/10 text-emerald-400'
-                      : 'bg-rose-500/10 text-rose-400'
-                  }`}
-                >
-                  {item.isCorrect ? (
-                    <>
-                      <CheckCircle2 className="w-3 h-3" /> Correct
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="w-3 h-3" /> Incorrect
-                    </>
-                  )}
-                </span>
-              </div>
-
-              <p className="text-[11px] font-semibold text-white mb-2 leading-relaxed">
-                {item.question}
-              </p>
-
-              <div className="bg-slate-950 rounded-lg p-2 mb-2 text-[10px] space-y-1">
-                <div className="flex items-start gap-1">
-                  <span className="text-slate-500 w-16 shrink-0">Your pick:</span>
-                  <span className={item.isCorrect ? 'text-emerald-400 font-medium' : 'text-rose-400 font-medium'}>
-                    {selectedOpt ? `(${selectedOpt.label}) ${selectedOpt.text}` : 'Unanswered'}
-                  </span>
-                </div>
-                {!item.isCorrect && (
-                  <div className="flex items-start gap-1">
-                    <span className="text-slate-500 w-16 shrink-0">Correct:</span>
-                    <span className="text-emerald-400 font-medium">
-                      {correctOpt ? `(${correctOpt.label}) ${correctOpt.text}` : ''}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Backend explanation */}
-              <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-lg p-2 text-[10px] text-slate-300 leading-relaxed">
-                <span className="font-bold text-emerald-400 block mb-0.5">Explanation:</span>
-                {item.explanation}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Buttons */}
-      <div className="space-y-2 pt-2">
         <button
           onClick={onRetake}
-          className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+          className="w-full py-2 bg-slate-950 border border-slate-800 text-slate-400 rounded-xl text-[11px]"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Retake Challenge</span>
-        </button>
-        <button
-          onClick={onGoHome}
-          className="w-full py-2.5 bg-slate-900 border border-slate-800 text-slate-300 hover:text-white rounded-xl font-semibold text-xs transition-all"
-        >
-          Return to Categories
+          Retake Exam
         </button>
       </div>
     </div>
@@ -1067,41 +1049,505 @@ function SimulatorResultScreen({
 }
 
 // -------------------------------------------------------------
-// Tab: Hono RPC API Live Explorer
+// Screen 6: Attempted Answer Screen (বাংলা, ইংরেজি, GK tabs)
 // -------------------------------------------------------------
-function HonoApiExplorer() {
-  const [selectedEndpoint, setSelectedEndpoint] = useState<'categories' | 'quiz' | 'submit' | 'health'>('categories');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+const DEFAULT_SIMULATOR_REVIEWS = [
+  {
+    questionId: 'bnk-1',
+    questionNumber: 1,
+    subject: 'bangla' as const,
+    subjectNameBn: 'বাংলা',
+    question: 'কোন বানানটি শুদ্ধ?',
+    selectedOptionId: 'opt-c',
+    correctOptionId: 'opt-b',
+    isCorrect: false,
+    isSkipped: false,
+    explanation: 'শুদ্ধ বানান হলো "মুহূর্ত" (ম-এ হ্রস্ব উ-কার, হ-এ দীর্ঘ ঊ-কার, রেফ ত)।',
+    options: [
+      { id: 'opt-a', label: 'A' as const, text: 'মুহূর্মুহু' },
+      { id: 'opt-b', label: 'B' as const, text: 'মুহূর্ত' },
+      { id: 'opt-c', label: 'C' as const, text: 'মূহুর্ত' },
+    ],
+  },
+  {
+    questionId: 'bnk-2',
+    questionNumber: 2,
+    subject: 'bangla' as const,
+    subjectNameBn: 'বাংলা',
+    question: '"কাজী নজরুল ইসলাম" কোন পত্রিকার সম্পাদক ছিলেন?',
+    selectedOptionId: 'opt-a',
+    correctOptionId: 'opt-a',
+    isCorrect: true,
+    isSkipped: false,
+    explanation: '১৯২২ সালে প্রকাশিত অর্ধ-সাপ্তাহিক "ধূমকেতু" পত্রিকার সম্পাদক ছিলেন কাজী নজরুল ইসলাম।',
+    options: [
+      { id: 'opt-a', label: 'A' as const, text: 'ধূমকেতু' },
+      { id: 'opt-b', label: 'B' as const, text: 'সবুজপত্র' },
+    ],
+  },
+  {
+    questionId: 'bnk-3',
+    questionNumber: 3,
+    subject: 'english' as const,
+    subjectNameBn: 'ইংরেজি',
+    question: 'Choose the correct synonym of "Paucity":',
+    selectedOptionId: 'opt-b',
+    correctOptionId: 'opt-a',
+    isCorrect: false,
+    isSkipped: false,
+    explanation: '"Paucity" means scarcity or insufficiency.',
+    options: [
+      { id: 'opt-a', label: 'A' as const, text: 'Scarcity' },
+      { id: 'opt-b', label: 'B' as const, text: 'Surplus' },
+    ],
+  },
+  {
+    questionId: 'bnk-4',
+    questionNumber: 4,
+    subject: 'english' as const,
+    subjectNameBn: 'ইংরেজি',
+    question: 'The committee has submitted ___ report on time.',
+    selectedOptionId: 'opt-a',
+    correctOptionId: 'opt-a',
+    isCorrect: true,
+    isSkipped: false,
+    explanation: 'Singular neuter pronoun "its" is used for collective nouns acting as a single unit.',
+    options: [
+      { id: 'opt-a', label: 'A' as const, text: 'its' },
+      { id: 'opt-b', label: 'B' as const, text: 'their' },
+    ],
+  },
+];
 
-  const {
-    data: responseLog,
-    isLoading,
-    refetch,
-    isFetching,
-  } = useQuery({
-    queryKey: ['hono-explorer', selectedEndpoint, categoryFilter],
+function SimulatorAttemptedScreen({
+  result,
+  onBack,
+}: {
+  result: SubmitQuizResponse | null;
+  onBack: () => void;
+}) {
+  const [subjectFilter, setSubjectFilter] = useState<'all' | 'bangla' | 'english' | 'gk'>('all');
+
+  const filtered = useMemo(() => {
+    const items = result?.review || DEFAULT_SIMULATOR_REVIEWS;
+    if (subjectFilter === 'all') return items;
+    return items.filter((i) => i.subject === subjectFilter);
+  }, [result?.review, subjectFilter]);
+
+  const corrects = filtered.filter((i) => i.isCorrect);
+  const wrongs = filtered.filter((i) => !i.isCorrect);
+
+  return (
+    <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto select-none">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-900 bg-slate-950">
+        <button onClick={onBack} className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-slate-400">
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <div className="text-center">
+          <span className="text-xs font-bold text-white block">Attempted Answer Screen</span>
+          <span className="text-[10px] text-slate-400">বাংলা, ইংরেজি, GK উত্তরমালা</span>
+        </div>
+        <div className="w-8" />
+      </div>
+
+      {/* Subject Tabs matching sketch: [ বাংলা ] [ ইংরেজি ] [ GK ] */}
+      <div className="flex gap-1.5 p-2.5 bg-slate-900/60 border-b border-slate-800 overflow-x-auto">
+        {[
+          { id: 'all', label: 'All' },
+          { id: 'bangla', label: 'বাংলা' },
+          { id: 'english', label: 'ইংরেজি' },
+          { id: 'gk', label: 'GK' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setSubjectFilter(tab.id as any)}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+              subjectFilter === tab.id ? 'bg-emerald-500 text-slate-950' : 'bg-slate-950 text-slate-400'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Two Column Layout matching sketch: Correct (Q.2, Q.4) vs Wrong (Q.1, Q.3) */}
+      <div className="p-4 space-y-4">
+        <div className="grid grid-cols-2 gap-2 text-center">
+          <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-2.5">
+            <span className="text-xs font-bold text-emerald-400 block underline">Correct</span>
+            <span className="text-[11px] text-slate-300 mt-1 block">
+              {corrects.map((q) => `Q.${q.questionNumber}`).join(', ') || 'None'}
+            </span>
+          </div>
+
+          <div className="bg-rose-950/30 border border-rose-500/40 rounded-xl p-2.5">
+            <span className="text-xs font-bold text-rose-400 block underline">Wrong</span>
+            <span className="text-[11px] text-slate-300 mt-1 block">
+              {wrongs.map((q) => `Q.${q.questionNumber}`).join(', ') || 'None'}
+            </span>
+          </div>
+        </div>
+
+        {/* Detailed Solutions */}
+        <div className="space-y-2.5">
+          {filtered.map((item) => {
+            const selectedOpt = item.options.find((o) => o.id === item.selectedOptionId);
+            const correctOpt = item.options.find((o) => o.id === item.correctOptionId);
+
+            return (
+              <div
+                key={item.questionId}
+                className={`p-3 rounded-xl border text-xs ${
+                  item.isCorrect ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-rose-900/50'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-bold text-white">Q.{item.questionNumber} ({item.subjectNameBn})</span>
+                  <span className={`text-[10px] font-bold ${item.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {item.isCorrect ? 'Correct (+1.0)' : 'Wrong (-0.25)'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-200 mb-2">{item.question}</p>
+
+                <div className="bg-slate-950 p-2 rounded-lg text-[10px] space-y-0.5 mb-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Your pick:</span>
+                    <span className={item.isCorrect ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                      {selectedOpt ? `(${selectedOpt.label}) ${selectedOpt.text}` : 'Skipped'}
+                    </span>
+                  </div>
+                  {!item.isCorrect && (
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-900">
+                      <span className="text-slate-400">Correct:</span>
+                      <span className="text-emerald-400 font-bold">
+                        {correctOpt ? `(${correctOpt.label}) ${correctOpt.text}` : ''}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-emerald-950/20 border border-emerald-500/20 p-2 rounded text-[10px] text-slate-300">
+                  <span className="font-bold text-emerald-400 block mb-0.5">ব্যাখ্যা (Explanation):</span>
+                  {item.explanation}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Screen 7: Merit List Screen (1. 2. 3. 4.)
+// -------------------------------------------------------------
+function SimulatorMeritScreen({ onBack }: { onBack: () => void }) {
+  const { data } = useQuery<{ list: MeritStudent[] }>({
+    queryKey: ['merit-list'],
+    queryFn: async () => {
+      const res = await fetch('/api/merit-list');
+      const json = await res.json();
+      return { list: json.data };
+    },
+  });
+
+  const list = data?.list || [];
+
+  return (
+    <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto select-none">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-900 bg-slate-950">
+        <button onClick={onBack} className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-slate-400">
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <div className="text-center">
+          <span className="text-xs font-bold text-white block">Merit List Screen</span>
+          <span className="text-[10px] text-slate-400">লাইভ মেধাতালিকা</span>
+        </div>
+        <div className="w-8" />
+      </div>
+
+      <div className="p-4 space-y-2.5">
+        {/* Your rank */}
+        <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-950/40 to-slate-900 border border-emerald-500/40 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center">
+              #4
+            </div>
+            <div>
+              <span className="text-[10px] text-emerald-400 font-bold block">Your Rank</span>
+              <span className="text-xs font-bold text-white">Md. Rakib Hossain</span>
+            </div>
+          </div>
+          <span className="text-xs font-bold text-emerald-400">4.75 Marks</span>
+        </div>
+
+        {/* Merit List items matching sketch: 1. 2. 3. 4. */}
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mt-2">
+          Rank List (Live Candidates)
+        </span>
+
+        {list.map((s) => (
+          <div
+            key={s.rank}
+            className={`p-3 rounded-xl border flex items-center justify-between ${
+              s.rank === 4 ? 'bg-emerald-950/20 border-emerald-500/40' : 'bg-slate-900 border-slate-800'
+            }`}
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <span
+                className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
+                  s.rank === 1
+                    ? 'bg-amber-500 text-slate-950'
+                    : s.rank === 2
+                    ? 'bg-slate-400 text-slate-950'
+                    : s.rank === 3
+                    ? 'bg-amber-700 text-white'
+                    : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {s.rank}.
+              </span>
+              <div className="truncate">
+                <span className="text-xs font-bold text-white block truncate">{s.name}</span>
+                <span className="text-[10px] text-slate-400 block truncate">{s.institution}</span>
+              </div>
+            </div>
+
+            <div className="text-right shrink-0 ml-2">
+              <span className="text-xs font-bold text-white block">{s.score} / {s.totalMarks}</span>
+              <span className="text-[10px] text-slate-500">{s.timeTaken}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Screen 8: Affiliate Screen (Refer to a friend & FB Friend list)
+// -------------------------------------------------------------
+function SimulatorAffiliateScreen({
+  onBack,
+  onGoSettings,
+}: {
+  onBack: () => void;
+  onGoSettings: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const { data } = useQuery({
+    queryKey: ['affiliate'],
+    queryFn: async () => {
+      const res = await fetch('/api/affiliate');
+      const json = await res.json();
+      return json.data;
+    },
+  });
+
+  const friends = data?.fbFriends || [];
+
+  return (
+    <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto select-none">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-900 bg-slate-950">
+        <button onClick={onBack} className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-slate-400">
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <div className="text-center">
+          <span className="text-xs font-bold text-white block">Affiliate Screen</span>
+          <span className="text-[10px] text-slate-400">রেফারেল প্রোগ্রাম</span>
+        </div>
+        <div className="w-8" />
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* Earnings */}
+        <div className="bg-gradient-to-br from-emerald-950/40 to-slate-900 border border-emerald-500/30 rounded-2xl p-4">
+          <span className="text-[10px] font-bold text-emerald-400 uppercase">Affiliate Balance</span>
+          <h3 className="text-2xl font-black text-white mt-0.5">৳ {data?.totalEarnedTk ?? 850} BDT</h3>
+          <p className="text-[10px] text-slate-400 mt-1 mb-3">Earn ৳ 50 per friend who joins.</p>
+          <button
+            onClick={onGoSettings}
+            className="w-full py-2 bg-emerald-500 text-slate-950 text-xs font-bold rounded-lg"
+          >
+            Withdraw to bKash / Nagad
+          </button>
+        </div>
+
+        {/* Refer to a friend matching sketch */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <h4 className="text-xs font-bold text-white mb-1">Refer to a friend</h4>
+          <p className="text-[10px] text-slate-400 mb-2.5">Share code with batchmates</p>
+
+          <div className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl p-2.5">
+            <span className="text-xs font-mono font-bold text-emerald-400">BCS2026RAKIB</span>
+            <button
+              onClick={() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="px-2.5 py-1 bg-slate-800 text-[11px] text-slate-300 font-semibold rounded-lg flex items-center gap-1"
+            >
+              {copied ? 'Copied!' : 'Copy Code'}
+            </button>
+          </div>
+        </div>
+
+        {/* FB Friend list matching sketch */}
+        <div>
+          <h4 className="text-xs font-bold text-white mb-2">FB Friend list</h4>
+          <div className="space-y-2">
+            {friends.map((f: any) => (
+              <div
+                key={f.id}
+                className="p-2.5 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between"
+              >
+                <div>
+                  <span className="text-xs font-bold text-white block truncate">{f.name}</span>
+                  <span className="text-[10px] text-slate-500">{f.mutualFriends} mutual friends</span>
+                </div>
+                {f.status === 'joined' ? (
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                    +৳50 Earned
+                  </span>
+                ) : (
+                  <button className="px-3 py-1 bg-blue-600 text-white rounded text-[11px] font-bold">
+                    Invite
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Screen 9: Settings Screen (Name, Attempted quiz, Total M., Affiliate tk)
+// -------------------------------------------------------------
+function SimulatorSettingsScreen({
+  onBack,
+  onLogout,
+}: {
+  onBack: () => void;
+  onLogout: () => void;
+}) {
+  const { data: profile } = useQuery<UserProfile>({
+    queryKey: ['user-profile'],
+    queryFn: async () => {
+      const res = await fetch('/api/user-profile');
+      const json = await res.json();
+      return json.data;
+    },
+  });
+
+  const [withdrawDone, setWithdrawDone] = useState(false);
+
+  return (
+    <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto select-none">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-slate-900 bg-slate-950">
+        <button onClick={onBack} className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-slate-400">
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <div className="text-center">
+          <span className="text-xs font-bold text-white block">Settings Screen</span>
+          <span className="text-[10px] text-slate-400">প্রোফাইল ও মেট্রিক্স</span>
+        </div>
+        <div className="w-8" />
+      </div>
+
+      <div className="p-4 space-y-3">
+        {/* User Name matching sketch: "Name:" */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase">Name:</span>
+          <h3 className="text-sm font-bold text-white mt-0.5">{profile?.name || 'Md. Rakib Hossain'}</h3>
+          <p className="text-[11px] text-slate-400">{profile?.institution || 'University of Dhaka'}</p>
+        </div>
+
+        {/* 3 Metrics matching sketch: Attempted quiz, Total M., Affiliate tk */}
+        <div className="space-y-2">
+          {/* Attempted quiz */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-300">Attempted quiz:</span>
+            <span className="text-xs font-bold text-blue-400">
+              {profile?.attemptedQuizCount ?? 42} Tests
+            </span>
+          </div>
+
+          {/* Total M. */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-300">Total M.:</span>
+            <span className="text-xs font-bold text-amber-400">
+              {profile?.totalMarksScored ?? 86.5} Marks
+            </span>
+          </div>
+
+          {/* Affiliate tk */}
+          <div className="bg-slate-900 border border-emerald-500/30 rounded-xl p-3 flex items-center justify-between">
+            <div>
+              <span className="text-xs font-bold text-emerald-400 block">Affiliate tk:</span>
+              <span className="text-[10px] text-slate-500">Available balance</span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs font-bold text-emerald-400 block">
+                ৳ {profile?.affiliateEarningsTk ?? 850} Tk
+              </span>
+              <button
+                onClick={() => {
+                  setWithdrawDone(true);
+                  setTimeout(() => setWithdrawDone(false), 2500);
+                }}
+                className="mt-1 px-2 py-0.5 bg-emerald-500 text-slate-950 text-[10px] font-bold rounded"
+              >
+                {withdrawDone ? 'bKash Sent!' : 'Withdraw'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Logout */}
+        <button
+          onClick={onLogout}
+          className="w-full mt-4 py-2.5 bg-slate-900 border border-slate-800 text-rose-400 text-xs font-bold rounded-xl"
+        >
+          Log Out / Switch User
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Tab: Hono API Explorer
+// -------------------------------------------------------------
+function HonoExplorerTab() {
+  const [selectedEndpoint, setSelectedEndpoint] = useState<string>('categories');
+
+  const { data: responseLog, isLoading, refetch } = useQuery({
+    queryKey: ['hono-explorer', selectedEndpoint],
     queryFn: async () => {
       const start = performance.now();
       let url = '/api/categories';
       let options: RequestInit = { method: 'GET' };
 
-      if (selectedEndpoint === 'categories') {
-        url = categoryFilter === 'all' ? '/api/categories' : `/api/categories?difficulty=${categoryFilter}`;
-      } else if (selectedEndpoint === 'quiz') {
-        url = '/api/quizzes/react-native';
-      } else if (selectedEndpoint === 'submit') {
+      if (selectedEndpoint === 'categories') url = '/api/categories';
+      else if (selectedEndpoint === 'quiz') url = '/api/quizzes/bank';
+      else if (selectedEndpoint === 'merit') url = '/api/merit-list';
+      else if (selectedEndpoint === 'affiliate') url = '/api/affiliate';
+      else if (selectedEndpoint === 'profile') url = '/api/user-profile';
+      else if (selectedEndpoint === 'submit') {
         url = '/api/quizzes/submit';
         options = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            quizId: 'react-native',
-            answers: { 'rn-1': 'opt-a', 'rn-2': 'opt-a', 'rn-3': 'opt-a', 'rn-4': 'opt-a' },
-            timeSpentSeconds: 38,
+            quizId: 'bank',
+            answers: { 'bnk-1': 'opt-b', 'bnk-2': 'opt-a', 'bnk-3': 'opt-a' },
+            timeSpentSeconds: 95,
           }),
         };
-      } else if (selectedEndpoint === 'health') {
-        url = '/api/health';
       }
 
       const res = await fetch(url, options);
@@ -1118,500 +1564,146 @@ function HonoApiExplorer() {
   });
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 lg:p-8">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-800">
+    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 lg:p-8 space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Terminal className="w-5 h-5 text-emerald-400" />
-            <h2 className="text-lg font-bold text-white">Live Hono RPC API Console</h2>
-          </div>
-          <p className="text-xs text-slate-400">
-            Interactive playground testing the backend routes typed with <code className="text-emerald-400">hc&lt;AppType&gt;</code>.
-          </p>
+          <h2 className="text-lg font-bold text-white">Live Hono Backend Endpoints</h2>
+          <p className="text-xs text-slate-400">All routes serving the 9 wireframe screens with RPC inference.</p>
         </div>
-
         <button
           onClick={() => refetch()}
-          disabled={isLoading || isFetching}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all"
+          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded-xl shadow-md"
         >
-          {isLoading || isFetching ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-          <span>Send Request</span>
+          Send Request
         </button>
       </div>
 
-      {/* Endpoint Selector Tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-        <button
-          onClick={() => setSelectedEndpoint('categories')}
-          className={`p-3 rounded-xl border text-left transition-all ${
-            selectedEndpoint === 'categories'
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-              : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-          }`}
-        >
-          <span className="text-[10px] font-bold uppercase tracking-wider block text-emerald-400">
-            GET
-          </span>
-          <span className="text-xs font-mono font-bold block mt-0.5">/api/categories</span>
-        </button>
-
-        <button
-          onClick={() => setSelectedEndpoint('quiz')}
-          className={`p-3 rounded-xl border text-left transition-all ${
-            selectedEndpoint === 'quiz'
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-              : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-          }`}
-        >
-          <span className="text-[10px] font-bold uppercase tracking-wider block text-emerald-400">
-            GET
-          </span>
-          <span className="text-xs font-mono font-bold block mt-0.5">/api/quizzes/:id</span>
-        </button>
-
-        <button
-          onClick={() => setSelectedEndpoint('submit')}
-          className={`p-3 rounded-xl border text-left transition-all ${
-            selectedEndpoint === 'submit'
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-              : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-          }`}
-        >
-          <span className="text-[10px] font-bold uppercase tracking-wider block text-amber-400">
-            POST
-          </span>
-          <span className="text-xs font-mono font-bold block mt-0.5">/api/quizzes/submit</span>
-        </button>
-
-        <button
-          onClick={() => setSelectedEndpoint('health')}
-          className={`p-3 rounded-xl border text-left transition-all ${
-            selectedEndpoint === 'health'
-              ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
-              : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-          }`}
-        >
-          <span className="text-[10px] font-bold uppercase tracking-wider block text-cyan-400">
-            GET
-          </span>
-          <span className="text-xs font-mono font-bold block mt-0.5">/api/health</span>
-        </button>
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+        {['categories', 'quiz', 'submit', 'merit', 'affiliate', 'profile'].map((ep) => (
+          <button
+            key={ep}
+            onClick={() => setSelectedEndpoint(ep)}
+            className={`p-2.5 rounded-xl border text-xs font-bold transition-all text-left ${
+              selectedEndpoint === ep
+                ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                : 'bg-slate-950 border-slate-800 text-slate-400'
+            }`}
+          >
+            /api/{ep}
+          </button>
+        ))}
       </div>
 
-      {/* Query Params Modifier if Categories */}
-      {selectedEndpoint === 'categories' && (
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 mb-6 flex items-center gap-3">
-          <span className="text-xs font-semibold text-slate-300">Filter Query (?difficulty=):</span>
-          <div className="flex gap-1.5">
-            {['all', 'easy', 'medium', 'hard'].map((d) => (
-              <button
-                key={d}
-                onClick={() => setCategoryFilter(d)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
-                  categoryFilter === d
-                    ? 'bg-emerald-500 text-slate-950 font-bold'
-                    : 'bg-slate-900 text-slate-400'
-                }`}
-              >
-                {d}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Response Box */}
-      <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-inner">
-        <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-emerald-400">{responseLog?.url}</span>
-            {responseLog && (
-              <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded font-semibold text-[11px]">
-                {responseLog.status} OK
-              </span>
-            )}
-          </div>
-          {responseLog && (
-            <span className="text-slate-400 font-mono text-[11px]">
-              Latency: {responseLog.latencyMs}ms
-            </span>
-          )}
-        </div>
-
-        <div className="p-4 max-h-96 overflow-y-auto font-mono text-xs text-slate-300 leading-relaxed">
-          <pre>{JSON.stringify(responseLog?.body, null, 2)}</pre>
-        </div>
+      <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-300 max-h-96 overflow-y-auto">
+        <pre>{JSON.stringify(responseLog?.body, null, 2)}</pre>
       </div>
     </div>
   );
 }
 
 // -------------------------------------------------------------
-// Tab: Project Files Viewer
+// Tab: Expo Source Files
 // -------------------------------------------------------------
-function ProjectFilesViewer() {
-  const [selectedFile, setSelectedFile] = useState<string>('src/services/api.ts');
-  const [copied, setCopied] = useState(false);
+function ExpoFilesTab() {
+  const [selectedFile, setSelectedFile] = useState<string>('app/index.tsx');
 
-  const FILE_CONTENT: Record<string, string> = {
-    'src/services/api.ts': `import { hc } from 'hono/client';
-import type { AppType } from '../server/hono-app';
-import type { SubmitQuizRequest, SubmitQuizResponse, QuizCategory, QuizPayload } from '../types/quiz';
-
-/**
- * Resolves the backend base URL dynamically across Expo environments:
- * 1. Explicit EXPO_PUBLIC_API_URL or NEXT_PUBLIC_API_URL environment variable
- * 2. Web browser origin (window.location.origin)
- * 3. Fallback for iOS Simulator / Android Emulator / local development
- */
-export function getBaseUrl(): string {
-  if (process.env.EXPO_PUBLIC_API_URL) {
-    return process.env.EXPO_PUBLIC_API_URL.replace(/\\/$/, '');
-  }
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL.replace(/\\/$/, '');
-  }
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
-  return 'http://localhost:3000';
-}
-
-/**
- * End-to-end typed Hono RPC Client instance
- */
-export const client = hc<AppType>(getBaseUrl(), {
-  headers: {
-    'Content-Type': 'application/json',
-    'X-Client-Platform': 'expo-mobile',
-  },
-});
-
-export const api = {
-  async getCategories(difficulty?: string): Promise<QuizCategory[]> {
-    const query: Record<string, string> = {};
-    if (difficulty && difficulty !== 'all') {
-      query.difficulty = difficulty;
-    }
-    const res = await client.api.categories.$get({ query });
-    if (!res.ok) throw new Error(\`Failed to fetch categories: \${res.status}\`);
-    const json = await res.json();
-    return json.data as QuizCategory[];
-  },
-
-  async getQuizById(id: string): Promise<{ quiz: QuizPayload; feedbackKey: Record<string, string> }> {
-    const res = await client.api.quizzes[':id'].$get({ param: { id } });
-    if (!res.ok) throw new Error(\`Quiz \${id} not found\`);
-    const json = await res.json();
-    return { quiz: json.data as QuizPayload, feedbackKey: json.feedbackKey as Record<string, string> };
-  },
-
-  async submitQuiz(payload: SubmitQuizRequest): Promise<SubmitQuizResponse> {
-    const res = await client.api.quizzes.submit.$post({ json: payload });
-    if (!res.ok) throw new Error('Quiz submission failed');
-    const json = await res.json();
-    return json.data as SubmitQuizResponse;
-  },
-};`,
-    'src/hooks/useQuiz.ts': `import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../services/api';
-import type { QuizCategory, QuizPayload, SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
-
-export const quizKeys = {
-  all: ['quizzes'] as const,
-  categories: (difficulty?: string) => [...quizKeys.all, 'categories', difficulty ?? 'all'] as const,
-  detail: (id: string) => [...quizKeys.all, 'detail', id] as const,
-  results: () => [...quizKeys.all, 'results'] as const,
-  result: (quizId: string) => [...quizKeys.results(), quizId] as const,
-  lastResult: ['quizzes', 'last-result'] as const,
-};
-
-export function useCategories(difficulty?: string) {
-  return useQuery<QuizCategory[], Error>({
-    queryKey: quizKeys.categories(difficulty),
-    queryFn: () => api.getCategories(difficulty),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
-  });
-}
-
-export function useQuiz(id: string) {
-  return useQuery<{ quiz: QuizPayload; feedbackKey: Record<string, string> }, Error>({
-    queryKey: quizKeys.detail(id),
-    queryFn: () => api.getQuizById(id),
-    enabled: Boolean(id),
-    staleTime: 1000 * 60 * 2,
-  });
-}
-
-export function useSubmitQuiz() {
-  const queryClient = useQueryClient();
-  return useMutation<SubmitQuizResponse, Error, SubmitQuizRequest>({
-    mutationFn: (payload: SubmitQuizRequest) => api.submitQuiz(payload),
-    onSuccess: (data) => {
-      queryClient.setQueryData(quizKeys.lastResult, data);
-      queryClient.setQueryData(quizKeys.result(data.quizId), data);
-      queryClient.invalidateQueries({ queryKey: quizKeys.categories() });
-    },
-  });
-}
-
-export function useLastResult() {
-  const queryClient = useQueryClient();
-  return {
-    data: queryClient.getQueryData<SubmitQuizResponse>(quizKeys.lastResult),
-  };
-}`,
-    'app/_layout.tsx': `import React from 'react';
-import { Stack } from 'expo-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { StatusBar } from 'expo-status-bar';
-import '../global.css';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 2,
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-export default function RootLayout() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: '#0f172a' },
-          headerTintColor: '#f8fafc',
-          headerTitleStyle: { fontWeight: 'bold' },
-          contentStyle: { backgroundColor: '#090d16' },
-          animation: 'slide_from_right',
-        }}
-      >
-        <Stack.Screen name="index" options={{ title: 'QuizPulse', headerShown: false }} />
-        <Stack.Screen name="quiz/[id]" options={{ title: 'Quiz Arena', headerShown: false, gestureEnabled: false }} />
-        <Stack.Screen name="quiz/result" options={{ title: 'Quiz Performance', headerShown: false, gestureEnabled: false }} />
-      </Stack>
-    </QueryClientProvider>
-  );
-}`,
-    'app/index.tsx': `// Category Selection Screen (NativeWind v4 & Lucide React Native)
-import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, Pressable, RefreshControl, SafeAreaView } from 'react-native';
+  const FILES: Record<string, string> = {
+    'app/auth/login.tsx': `// 1. Login Screen / Auth Screen (Name, Email, Google & Facebook Auth)
+import React, { useState } from 'react';
+import { View, Text, TextInput, Pressable, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Sparkles, Smartphone, Code2, Flame, Clock, HelpCircle, ChevronRight } from 'lucide-react-native';
-import { useCategories } from '../src/hooks/useQuiz';
 
-export default function CategoryScreen() {
+export default function LoginScreen() {
   const router = useRouter();
-  const [selectedDifficulty, setSelectedDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
-  const { data: categories = [], isLoading, refetch, isRefetching } = useCategories(
-    selectedDifficulty === 'all' ? undefined : selectedDifficulty
-  );
-
-  return (
-    <SafeAreaView className="flex-1 bg-slate-950">
-      <ScrollView className="flex-1 px-4 pt-3 pb-8" refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}>
-        {/* Dynamic Category List & Difficulty Filters */}
-      </ScrollView>
-    </SafeAreaView>
-  );
+  // Name, Email, Sign in with (G) (F)
 }`,
-    'app/quiz/[id].tsx': `// Main Interactive Quiz Screen with Countdown Timer & Immediate Feedback
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, Modal, SafeAreaView } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Clock, CheckCircle2, XCircle, AlertTriangle, ArrowLeft } from 'lucide-react-native';
-import { useQuiz, useSubmitQuiz } from '../../src/hooks/useQuiz';
+    'app/auth/register.tsx': `// 2. Register Screen (Name, Institution, Job Type: BCS | Bank | Private | Govt. Job)
+import React, { useState } from 'react';
+import { View, Text, TextInput, Pressable, SafeAreaView } from 'react-native';
 
-export default function QuizExecutionScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { data, isLoading } = useQuiz(id || '');
-  // Immediate feedback: emerald-500 on correct, rose-500 on incorrect
-  // Backout prevention modal mid-quiz
+export default function RegisterScreen() {
+  // Name, Institution, Job Type selector
 }`,
-    'app/quiz/result.tsx': `// Results Screen with Animated Score Summary & Backend Explanations
+    'app/index.tsx': `// 3. Home Screen (Hero Area + ক্যাটাগরি: BCS, Bank, Govt. Job, Private)
 import React from 'react';
 import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
-import { Trophy, CheckCircle2, XCircle, RotateCcw, Home } from 'lucide-react-native';
+import { useCategories } from '../src/hooks/useQuiz';
+
+export default function HomeScreen() {
+  // Hero Area banner, ক্যাটাগরি circle buttons
+}`,
+    'app/quiz/[id].tsx': `// 4. Quiz Screen (Bank/BCS exam, Q.1, Q.2, options A, B, C, D, timer)
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
+import { useQuiz, useSubmitQuiz } from '../../src/hooks/useQuiz';
+
+export default function QuizScreen() {
+  // Question sheet, Options A, B, C, D, Negative marking
+}`,
+    'app/quiz/result.tsx': `// 5. Result Screen (Pie Chart with Correct, Wrong, Skipped)
+import React from 'react';
+import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
 import { useLastResult } from '../../src/hooks/useQuiz';
 
-export default function QuizResultScreen() {
-  const { data: cachedResult } = useLastResult();
-  // Score percentage ring, accuracy breakdown, and questions explanation list
+export default function ResultScreen() {
+  // Pie chart calculation: Correct, Wrong, Skipped
 }`,
-    'tailwind.config.js': `/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./app/**/*.{js,jsx,ts,tsx}",
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}",
-  ],
-  presets: [require("nativewind/preset")],
-  theme: {
-    extend: {
-      colors: {
-        brand: {
-          500: '#10b981', // emerald-500 for correct answers
-          600: '#059669',
-        },
-        error: {
-          500: '#f43f5e', // rose-500 for incorrect options
-        },
-      },
-    },
-  },
-  plugins: [],
-};`,
-    'global.css': `@tailwind base;
-@tailwind components;
-@tailwind utilities;
+    'app/quiz/attempted.tsx': `// 6. Attempted Answer Screen (বাংলা, ইংরেজি, GK tabs, Correct vs Wrong lists)
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
 
-:root {
-  --color-primary: #10b981;
-  --color-error: #f43f5e;
+export default function AttemptedAnswerScreen() {
+  // Correct (Q.2, Q.4) vs Wrong (Q.1, Q.3) two columns with explanations
 }`,
-  };
+    'app/merit.tsx': `// 7. Merit List Screen (1., 2., 3., 4. Candidate Rank List)
+import React from 'react';
+import { View, Text, ScrollView, SafeAreaView } from 'react-native';
+import { useMeritList } from '../src/hooks/useQuiz';
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(FILE_CONTENT[selectedFile] || '');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+export default function MeritListScreen() {
+  // 1., 2., 3., 4. Live student rankings
+}`,
+    'app/affiliate.tsx': `// 8. Affiliate Screen (Refer to a friend & FB Friend list)
+import React from 'react';
+import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
+import { useAffiliateData } from '../src/hooks/useQuiz';
+
+export default function AffiliateScreen() {
+  // Refer to a friend, referral code, FB friend list invite buttons
+}`,
+    'app/settings.tsx': `// 9. Settings Screen (Name, Attempted quiz, Total M., Affiliate tk)
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Pressable, SafeAreaView } from 'react-native';
+import { useUserProfile } from '../src/hooks/useQuiz';
+
+export default function SettingsScreen() {
+  // Name, Attempted quiz, Total M., Affiliate tk with bKash withdrawal
+}`,
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      {/* File List Navigation */}
-      <div className="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">
-          Required Deliverables ({Object.keys(FILE_CONTENT).length} Files)
-        </h3>
-        <div className="space-y-1">
-          {Object.keys(FILE_CONTENT).map((file) => (
-            <button
-              key={file}
-              onClick={() => setSelectedFile(file)}
-              className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-mono transition-all flex items-center justify-between ${
-                selectedFile === file
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <span>{file}</span>
-              {selectedFile === file && <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Code Display Panel */}
-      <div className="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="px-5 py-3.5 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileCode className="w-4 h-4 text-emerald-400" />
-            <span className="font-mono text-xs font-bold text-white">{selectedFile}</span>
-          </div>
-
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+      <div className="md:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
+        <span className="text-[10px] font-bold text-slate-500 uppercase px-2 mb-2 block">
+          All 9 Screens in Project
+        </span>
+        {Object.keys(FILES).map((f) => (
           <button
-            onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 transition-all"
+            key={f}
+            onClick={() => setSelectedFile(f)}
+            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-mono transition-all ${
+              selectedFile === f
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold'
+                : 'text-slate-400 hover:text-white'
+            }`}
           >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400 font-bold">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5 text-slate-400" />
-                <span>Copy Code</span>
-              </>
-            )}
+            {f}
           </button>
-        </div>
-
-        <div className="p-5 font-mono text-xs text-slate-300 overflow-x-auto leading-relaxed max-h-[600px] overflow-y-auto bg-slate-950">
-          <pre>{FILE_CONTENT[selectedFile]}</pre>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// -------------------------------------------------------------
-// Tab: Architecture & Setup Spec
-// -------------------------------------------------------------
-function ArchitectureSpec() {
-  return (
-    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 lg:p-8 space-y-8">
-      <div>
-        <h2 className="text-xl font-bold text-white mb-2">Expo SDK 51 + Hono Full-Stack Architecture</h2>
-        <p className="text-xs text-slate-400 leading-relaxed max-w-3xl">
-          Complete production blueprint connecting a React Native / Expo Router client to a lightweight, edge-compatible Hono backend via RPC inference.
-        </p>
+        ))}
       </div>
 
-      {/* Architecture Flow Diagram */}
-      <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6">
-        <h3 className="text-sm font-bold text-white mb-4">Data & Type Pipeline</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-          <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2 font-mono text-xs font-bold">
-              1
-            </div>
-            <h4 className="text-xs font-bold text-white mb-1">Hono Server</h4>
-            <p className="text-[11px] text-slate-400">
-              Chained builder pattern defines route handlers and exports <code className="text-emerald-400">type AppType = typeof app</code>.
-            </p>
-          </div>
-
-          <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30 flex items-center justify-center mx-auto mb-2 font-mono text-xs font-bold">
-              2
-            </div>
-            <h4 className="text-xs font-bold text-white mb-1">hc&lt;AppType&gt; Client</h4>
-            <p className="text-[11px] text-slate-400">
-              Zero-codegen RPC client provides typed endpoints with autocomplete for query params and payloads.
-            </p>
-          </div>
-
-          <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-            <div className="w-8 h-8 rounded-lg bg-violet-500/10 text-violet-400 border border-violet-500/30 flex items-center justify-center mx-auto mb-2 font-mono text-xs font-bold">
-              3
-            </div>
-            <h4 className="text-xs font-bold text-white mb-1">TanStack Query</h4>
-            <p className="text-[11px] text-slate-400">
-              Wraps RPC calls in caching keys, automatic retries, background stale-while-revalidate, and optimistic mutations.
-            </p>
-          </div>
-
-          <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto mb-2 font-mono text-xs font-bold">
-              4
-            </div>
-            <h4 className="text-xs font-bold text-white mb-1">NativeWind v4</h4>
-            <p className="text-[11px] text-slate-400">
-              Precompiles Tailwind utility classes directly into native StyleSheet objects at build time for 60fps rendering.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Expo Quick Start Instructions */}
-      <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6">
-        <h3 className="text-sm font-bold text-white mb-3">Expo Mobile App Bootstrapping Guide</h3>
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 leading-relaxed space-y-2">
-          <p className="text-slate-500"># 1. Clone repository & install dependencies</p>
-          <p className="text-emerald-400">npm install</p>
-          <p className="text-slate-500"># 2. Start Hono backend / Next server</p>
-          <p className="text-emerald-400">npm run dev</p>
-          <p className="text-slate-500"># 3. In another terminal, run Expo for iOS / Android / Web</p>
-          <p className="text-emerald-400">npx expo start</p>
-        </div>
+      <div className="md:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-5 font-mono text-xs text-slate-300">
+        <pre>{FILES[selectedFile]}</pre>
       </div>
     </div>
   );
