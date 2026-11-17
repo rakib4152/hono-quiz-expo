@@ -1127,15 +1127,26 @@ function SimulatorAttemptedScreen({
   onBack: () => void;
 }) {
   const [subjectFilter, setSubjectFilter] = useState<'all' | 'bangla' | 'english' | 'gk'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'correct' | 'wrong'>('all');
 
-  const filtered = useMemo(() => {
+  const subjectFiltered = useMemo(() => {
     const items = result?.review || DEFAULT_SIMULATOR_REVIEWS;
     if (subjectFilter === 'all') return items;
     return items.filter((i) => i.subject === subjectFilter);
   }, [result?.review, subjectFilter]);
 
-  const corrects = filtered.filter((i) => i.isCorrect);
-  const wrongs = filtered.filter((i) => !i.isCorrect);
+  const corrects = useMemo(() => subjectFiltered.filter((i) => i.isCorrect), [subjectFiltered]);
+  const wrongs = useMemo(() => subjectFiltered.filter((i) => !i.isCorrect), [subjectFiltered]);
+
+  const displayedItems = useMemo(() => {
+    if (statusFilter === 'correct') return corrects;
+    if (statusFilter === 'wrong') return wrongs;
+    return subjectFiltered;
+  }, [statusFilter, subjectFiltered, corrects, wrongs]);
+
+  const toggleStatusFilter = (target: 'correct' | 'wrong') => {
+    setStatusFilter((prev) => (prev === target ? 'all' : target));
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-slate-950 overflow-y-auto select-none">
@@ -1173,67 +1184,131 @@ function SimulatorAttemptedScreen({
       {/* Two Column Layout matching sketch: Correct (Q.2, Q.4) vs Wrong (Q.1, Q.3) */}
       <div className="p-4 space-y-4">
         <div className="grid grid-cols-2 gap-2 text-center">
-          <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-2.5">
+          <button
+            type="button"
+            onClick={() => toggleStatusFilter('correct')}
+            className={`rounded-xl p-2.5 border transition-all cursor-pointer ${
+              statusFilter === 'correct'
+                ? 'bg-emerald-950/60 border-emerald-400 ring-2 ring-emerald-500/40 shadow-md'
+                : statusFilter === 'wrong'
+                ? 'bg-emerald-950/15 border-emerald-500/20 opacity-55 hover:opacity-85'
+                : 'bg-emerald-950/30 border-emerald-500/40 hover:border-emerald-400'
+            }`}
+          >
             <span className="text-xs font-bold text-emerald-400 block underline">Correct</span>
             <span className="text-[11px] text-slate-300 mt-1 block">
               {corrects.map((q) => `Q.${q.questionNumber}`).join(', ') || 'None'}
             </span>
-          </div>
+            <span className="text-[9px] text-emerald-300/80 mt-1 block">
+              {statusFilter === 'correct' ? 'Filtered • Tap for All' : 'Tap to view Correct'}
+            </span>
+          </button>
 
-          <div className="bg-rose-950/30 border border-rose-500/40 rounded-xl p-2.5">
+          <button
+            type="button"
+            onClick={() => toggleStatusFilter('wrong')}
+            className={`rounded-xl p-2.5 border transition-all cursor-pointer ${
+              statusFilter === 'wrong'
+                ? 'bg-rose-950/60 border-rose-400 ring-2 ring-rose-500/40 shadow-md'
+                : statusFilter === 'correct'
+                ? 'bg-rose-950/15 border-rose-500/20 opacity-55 hover:opacity-85'
+                : 'bg-rose-950/30 border-rose-500/40 hover:border-rose-400'
+            }`}
+          >
             <span className="text-xs font-bold text-rose-400 block underline">Wrong</span>
             <span className="text-[11px] text-slate-300 mt-1 block">
               {wrongs.map((q) => `Q.${q.questionNumber}`).join(', ') || 'None'}
             </span>
-          </div>
+            <span className="text-[9px] text-rose-300/80 mt-1 block">
+              {statusFilter === 'wrong' ? 'Filtered • Tap for All' : 'Tap to view Wrong'}
+            </span>
+          </button>
+        </div>
+
+        {/* Filter Status Bar */}
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            {statusFilter === 'correct'
+              ? `Correct Questions (${displayedItems.length})`
+              : statusFilter === 'wrong'
+              ? `Wrong Questions (${displayedItems.length})`
+              : `All Questions (${displayedItems.length})`}
+          </span>
+          {statusFilter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setStatusFilter('all')}
+              className="text-[10px] font-bold text-emerald-400 hover:underline"
+            >
+              Show All
+            </button>
+          )}
         </div>
 
         {/* Detailed Solutions */}
-        <div className="space-y-2.5">
-          {filtered.map((item) => {
-            const selectedOpt = item.options.find((o) => o.id === item.selectedOptionId);
-            const correctOpt = item.options.find((o) => o.id === item.correctOptionId);
+        {displayedItems.length === 0 ? (
+          <div className="p-4 rounded-xl border border-slate-800 bg-slate-900 text-center">
+            <p className="text-xs font-bold text-white mb-1">
+              No {statusFilter === 'correct' ? 'Correct' : 'Wrong'} Questions
+            </p>
+            <p className="text-[11px] text-slate-400 mb-2.5">
+              No matching questions in this subject tab.
+            </p>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('all')}
+              className="px-3 py-1.5 bg-emerald-500 text-slate-950 rounded-lg text-[11px] font-bold"
+            >
+              Show All Questions
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {displayedItems.map((item) => {
+              const selectedOpt = item.options.find((o) => o.id === item.selectedOptionId);
+              const correctOpt = item.options.find((o) => o.id === item.correctOptionId);
 
-            return (
-              <div
-                key={item.questionId}
-                className={`p-3 rounded-xl border text-xs ${
-                  item.isCorrect ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-rose-900/50'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-white">Q.{item.questionNumber} ({item.subjectNameBn})</span>
-                  <span className={`text-[10px] font-bold ${item.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {item.isCorrect ? 'Correct (+1.0)' : 'Wrong (-0.25)'}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-200 mb-2">{item.question}</p>
-
-                <div className="bg-slate-950 p-2 rounded-lg text-[10px] space-y-0.5 mb-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Your pick:</span>
-                    <span className={item.isCorrect ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                      {selectedOpt ? `(${selectedOpt.label}) ${selectedOpt.text}` : 'Skipped'}
+              return (
+                <div
+                  key={item.questionId}
+                  className={`p-3 rounded-xl border text-xs ${
+                    item.isCorrect ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-rose-900/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-white">Q.{item.questionNumber} ({item.subjectNameBn})</span>
+                    <span className={`text-[10px] font-bold ${item.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {item.isCorrect ? 'Correct (+1.0)' : 'Wrong (-0.25)'}
                     </span>
                   </div>
-                  {!item.isCorrect && (
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-900">
-                      <span className="text-slate-400">Correct:</span>
-                      <span className="text-emerald-400 font-bold">
-                        {correctOpt ? `(${correctOpt.label}) ${correctOpt.text}` : ''}
+                  <p className="text-[11px] text-slate-200 mb-2">{item.question}</p>
+
+                  <div className="bg-slate-950 p-2 rounded-lg text-[10px] space-y-0.5 mb-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Your pick:</span>
+                      <span className={item.isCorrect ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                        {selectedOpt ? `(${selectedOpt.label}) ${selectedOpt.text}` : 'Skipped'}
                       </span>
                     </div>
-                  )}
-                </div>
+                    {!item.isCorrect && (
+                      <div className="flex items-center justify-between pt-1 border-t border-slate-900">
+                        <span className="text-slate-400">Correct:</span>
+                        <span className="text-emerald-400 font-bold">
+                          {correctOpt ? `(${correctOpt.label}) ${correctOpt.text}` : ''}
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-                <div className="bg-emerald-950/20 border border-emerald-500/20 p-2 rounded text-[10px] text-slate-300">
-                  <span className="font-bold text-emerald-400 block mb-0.5">ব্যাখ্যা (Explanation):</span>
-                  {item.explanation}
+                  <div className="bg-emerald-950/20 border border-emerald-500/20 p-2 rounded text-[10px] text-slate-300">
+                    <span className="font-bold text-emerald-400 block mb-0.5">ব্যাখ্যা (Explanation):</span>
+                    {item.explanation}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

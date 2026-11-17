@@ -84,8 +84,9 @@ export default function AttemptedAnswerScreen() {
   const router = useRouter();
   const { data: result } = useLastResult();
   const [selectedSubject, setSelectedSubject] = useState<'all' | 'bangla' | 'english' | 'gk'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'correct' | 'wrong'>('all');
 
-  const filteredItems = useMemo(() => {
+  const subjectFilteredItems = useMemo(() => {
     const items = result?.review || DEFAULT_REVIEW_ITEMS;
     if (selectedSubject === 'all') return items;
     return items.filter((i) => i.subject === selectedSubject);
@@ -93,8 +94,18 @@ export default function AttemptedAnswerScreen() {
 
   // Separate into Correct and Wrong lists matching the two columns in the hand-drawn sketch:
   // "Correct: Q.2, Q.4" and "Wrong: Q.1, Q.3"
-  const correctQuestions = filteredItems.filter((i) => i.isCorrect);
-  const wrongQuestions = filteredItems.filter((i) => !i.isCorrect);
+  const correctQuestions = subjectFilteredItems.filter((i) => i.isCorrect);
+  const wrongQuestions = subjectFilteredItems.filter((i) => !i.isCorrect);
+
+  const displayedItems = useMemo(() => {
+    if (statusFilter === 'correct') return correctQuestions;
+    if (statusFilter === 'wrong') return wrongQuestions;
+    return subjectFilteredItems;
+  }, [statusFilter, subjectFilteredItems, correctQuestions, wrongQuestions]);
+
+  const toggleStatusFilter = (target: 'correct' | 'wrong') => {
+    setStatusFilter((prev) => (prev === target ? 'all' : target));
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-950">
@@ -140,108 +151,164 @@ export default function AttemptedAnswerScreen() {
       <ScrollView className="flex-1 px-4 pt-4 pb-16" showsVerticalScrollIndicator={false}>
         {/* Two-Column Summary Header matching hand-drawn sketch: "Correct | Wrong" */}
         <View className="grid grid-cols-2 flex-row gap-3 mb-6">
-          {/* Correct Column Summary */}
-          <View className="flex-1 bg-emerald-950/20 border border-emerald-500/30 rounded-2xl p-4 items-center">
+          {/* Correct Column Filter Card */}
+          <Pressable
+            onPress={() => toggleStatusFilter('correct')}
+            className={`flex-1 rounded-2xl p-4 items-center border transition-all ${
+              statusFilter === 'correct'
+                ? 'bg-emerald-950/50 border-emerald-400 shadow-lg shadow-emerald-950/40'
+                : statusFilter === 'wrong'
+                ? 'bg-emerald-950/10 border-emerald-500/20 opacity-60'
+                : 'bg-emerald-950/20 border-emerald-500/30'
+            }`}
+          >
             <View className="flex-row items-center mb-1">
               <CheckCircle2 size={16} color="#10b981" />
               <Text className="text-sm font-bold text-emerald-400 ml-1.5 underline">Correct</Text>
             </View>
-            <Text className="text-xs text-slate-300 mt-1">
+            <Text className="text-xs text-slate-300 mt-1 text-center">
               {correctQuestions.map((q) => `Q.${q.questionNumber}`).join(', ') || 'None'}
             </Text>
             <Text className="text-[10px] text-emerald-400 font-bold mt-1">+{correctQuestions.length}.00 Marks</Text>
-          </View>
+            <Text className="text-[10px] text-emerald-300/80 mt-1.5 font-medium">
+              {statusFilter === 'correct' ? 'Showing Correct • Tap for All' : 'Tap to filter Correct'}
+            </Text>
+          </Pressable>
 
-          {/* Wrong Column Summary */}
-          <View className="flex-1 bg-rose-950/20 border border-rose-500/30 rounded-2xl p-4 items-center">
+          {/* Wrong Column Filter Card */}
+          <Pressable
+            onPress={() => toggleStatusFilter('wrong')}
+            className={`flex-1 rounded-2xl p-4 items-center border transition-all ${
+              statusFilter === 'wrong'
+                ? 'bg-rose-950/50 border-rose-400 shadow-lg shadow-rose-950/40'
+                : statusFilter === 'correct'
+                ? 'bg-rose-950/10 border-rose-500/20 opacity-60'
+                : 'bg-rose-950/20 border-rose-500/30'
+            }`}
+          >
             <View className="flex-row items-center mb-1">
               <XCircle size={16} color="#f43f5e" />
               <Text className="text-sm font-bold text-rose-400 ml-1.5 underline">Wrong</Text>
             </View>
-            <Text className="text-xs text-slate-300 mt-1">
+            <Text className="text-xs text-slate-300 mt-1 text-center">
               {wrongQuestions.map((q) => `Q.${q.questionNumber}`).join(', ') || 'None'}
             </Text>
             <Text className="text-[10px] text-rose-400 font-bold mt-1">
               -{(wrongQuestions.length * 0.25).toFixed(2)} Negative Marks
             </Text>
-          </View>
+            <Text className="text-[10px] text-rose-300/80 mt-1.5 font-medium">
+              {statusFilter === 'wrong' ? 'Showing Wrong • Tap for All' : 'Tap to filter Wrong'}
+            </Text>
+          </Pressable>
         </View>
 
         {/* Detailed Question Reviews */}
-        <Text className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-          Detailed Solutions ({filteredItems.length} Questions)
-        </Text>
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            {statusFilter === 'correct'
+              ? `Correct Questions (${displayedItems.length})`
+              : statusFilter === 'wrong'
+              ? `Wrong Questions (${displayedItems.length})`
+              : `Detailed Solutions (${displayedItems.length} Questions)`}
+          </Text>
 
-        <View className="space-y-4">
-          {filteredItems.map((item) => {
-            const selectedOpt = item.options.find((o) => o.id === item.selectedOptionId);
-            const correctOpt = item.options.find((o) => o.id === item.correctOptionId);
+          {statusFilter !== 'all' && (
+            <Pressable
+              onPress={() => setStatusFilter('all')}
+              className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800"
+            >
+              <Text className="text-[11px] font-bold text-slate-300">Show All</Text>
+            </Pressable>
+          )}
+        </View>
 
-            return (
-              <View
-                key={item.questionId}
-                className={`border rounded-2xl p-4 mb-3.5 shadow-md ${
-                  item.isCorrect ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-rose-900/60'
-                }`}
-              >
-                <View className="flex-row items-center justify-between mb-2">
-                  <View className="flex-row items-center">
-                    <Text className="text-xs font-bold text-white mr-2">Q.{item.questionNumber}</Text>
-                    <Text className="text-[11px] text-slate-400 font-medium">({item.subjectNameBn})</Text>
+        {displayedItems.length === 0 ? (
+          <View className="bg-slate-900 border border-slate-800 rounded-2xl p-6 items-center">
+            <Text className="text-sm font-bold text-white mb-1">
+              No {statusFilter === 'correct' ? 'Correct' : 'Wrong'} Questions
+            </Text>
+            <Text className="text-xs text-slate-400 text-center mb-3">
+              There are no {statusFilter} questions in this subject tab.
+            </Text>
+            <Pressable
+              onPress={() => setStatusFilter('all')}
+              className="px-4 py-2 rounded-xl bg-emerald-500"
+            >
+              <Text className="text-xs font-bold text-slate-950">Show All Questions</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View className="space-y-4">
+            {displayedItems.map((item) => {
+              const selectedOpt = item.options.find((o) => o.id === item.selectedOptionId);
+              const correctOpt = item.options.find((o) => o.id === item.correctOptionId);
+
+              return (
+                <View
+                  key={item.questionId}
+                  className={`border rounded-2xl p-4 mb-3.5 shadow-md ${
+                    item.isCorrect ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 border-rose-900/60'
+                  }`}
+                >
+                  <View className="flex-row items-center justify-between mb-2">
+                    <View className="flex-row items-center">
+                      <Text className="text-xs font-bold text-white mr-2">Q.{item.questionNumber}</Text>
+                      <Text className="text-[11px] text-slate-400 font-medium">({item.subjectNameBn})</Text>
+                    </View>
+
+                    <View
+                      className={`flex-row items-center px-2 py-0.5 rounded-full ${
+                        item.isCorrect ? 'bg-emerald-500/10' : 'bg-rose-500/10'
+                      }`}
+                    >
+                      {item.isCorrect ? (
+                        <>
+                          <CheckCircle2 size={13} color="#10b981" />
+                          <Text className="text-[10px] font-bold text-emerald-400 ml-1">Correct (+1.0)</Text>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle size={13} color="#f43f5e" />
+                          <Text className="text-[10px] font-bold text-rose-400 ml-1">Wrong (-0.25)</Text>
+                        </>
+                      )}
+                    </View>
                   </View>
 
-                  <View
-                    className={`flex-row items-center px-2 py-0.5 rounded-full ${
-                      item.isCorrect ? 'bg-emerald-500/10' : 'bg-rose-500/10'
-                    }`}
-                  >
-                    {item.isCorrect ? (
-                      <>
-                        <CheckCircle2 size={13} color="#10b981" />
-                        <Text className="text-[10px] font-bold text-emerald-400 ml-1">Correct (+1.0)</Text>
-                      </>
-                    ) : (
-                      <>
-                        <XCircle size={13} color="#f43f5e" />
-                        <Text className="text-[10px] font-bold text-rose-400 ml-1">Wrong (-0.25)</Text>
-                      </>
-                    )}
-                  </View>
-                </View>
+                  <Text className="text-sm font-bold text-white mb-3 leading-snug">{item.question}</Text>
 
-                <Text className="text-sm font-bold text-white mb-3 leading-snug">{item.question}</Text>
-
-                {/* Answer Comparison Box */}
-                <View className="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-3 text-xs space-y-1.5">
-                  <View className="flex-row items-start">
-                    <Text className="text-slate-400 w-24 font-medium text-xs">Your Answer:</Text>
-                    <Text className={`text-xs font-bold flex-1 ${item.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {selectedOpt ? `(${selectedOpt.label}) ${selectedOpt.text}` : 'Skipped / Unattempted'}
-                    </Text>
-                  </View>
-
-                  {!item.isCorrect && (
-                    <View className="flex-row items-start pt-1.5 border-t border-slate-900">
-                      <Text className="text-slate-400 w-24 font-medium text-xs">Correct Ans:</Text>
-                      <Text className="text-xs font-bold text-emerald-400 flex-1">
-                        {correctOpt ? `(${correctOpt.label}) ${correctOpt.text}` : ''}
+                  {/* Answer Comparison Box */}
+                  <View className="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-3 text-xs space-y-1.5">
+                    <View className="flex-row items-start">
+                      <Text className="text-slate-400 w-24 font-medium text-xs">Your Answer:</Text>
+                      <Text className={`text-xs font-bold flex-1 ${item.isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {selectedOpt ? `(${selectedOpt.label}) ${selectedOpt.text}` : 'Skipped / Unattempted'}
                       </Text>
                     </View>
-                  )}
-                </View>
 
-                {/* Explanation in Bangla & English */}
-                <View className="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3">
-                  <View className="flex-row items-center mb-1">
-                    <Sparkles size={12} color="#10b981" />
-                    <Text className="text-[10px] font-bold text-emerald-400 uppercase ml-1">ব্যাখ্যা (Explanation)</Text>
+                    {!item.isCorrect && (
+                      <View className="flex-row items-start pt-1.5 border-t border-slate-900">
+                        <Text className="text-slate-400 w-24 font-medium text-xs">Correct Ans:</Text>
+                        <Text className="text-xs font-bold text-emerald-400 flex-1">
+                          {correctOpt ? `(${correctOpt.label}) ${correctOpt.text}` : ''}
+                        </Text>
+                      </View>
+                    )}
                   </View>
-                  <Text className="text-xs text-slate-300 leading-relaxed">{item.explanation}</Text>
+
+                  {/* Explanation in Bangla & English */}
+                  <View className="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-3">
+                    <View className="flex-row items-center mb-1">
+                      <Sparkles size={12} color="#10b981" />
+                      <Text className="text-[10px] font-bold text-emerald-400 uppercase ml-1">ব্যাখ্যা (Explanation)</Text>
+                    </View>
+                    <Text className="text-xs text-slate-300 leading-relaxed">{item.explanation}</Text>
+                  </View>
                 </View>
-              </View>
-            );
-          })}
-        </View>
+              );
+            })}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
